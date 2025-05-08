@@ -1,3 +1,6 @@
 [submodule "LLaVA"]
 	path = LLaVA
 	url = git@github.com:maplesyrup-0606/LLaVA.git
+[submodule "HAT"]
+	path = HAT
+	url = git@github.com:maplesyrup-0606/HAT.git
