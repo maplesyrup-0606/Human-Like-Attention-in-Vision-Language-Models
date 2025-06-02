@@ -1,15 +1,22 @@
 import json
 import os
 
-def convert_to_coco_format(ref_path, pred_path, out_dir):
+def convert_to_coco_format(ref_path, pred_path, out_dir, clip_scores_path=None):
     with open(ref_path, "r") as f:
         ref_file = json.load(f)
     with open(pred_path, "r") as f:
         pred_file = json.load(f)
 
+    clip_scores = None 
+    if clip_scores_path :
+        with open(clip_scores_path, "r") as f:
+            clip_scores = json.load(f)
+
     os.makedirs(out_dir, exist_ok=True)
-    out_ref_file = os.path.join(out_dir, "captions_val_gt_coco.json")
-    out_pred_file = os.path.join(out_dir, "captions_val_pred_coco.json")
+    
+    variant = os.path.basename(pred_path).split("_captions")[0]
+    out_ref_file = os.path.join(out_dir, f"captions_gt.json")
+    out_pred_file = os.path.join(out_dir, f"captions_{variant}.json")
 
     annotations = []
     images = []
@@ -28,12 +35,28 @@ def convert_to_coco_format(ref_path, pred_path, out_dir):
             })
             ann_id += 1
 
-    for img_id_str, pred_caption in pred_file.items():
+    ann_id = 0
+    for img_id_str, pred_captions in pred_file.items():
         img_id = int(img_id_str)
+
+        if isinstance(pred_captions, list):
+            if clip_scores:
+                scores = clip_scores.get(img_id_str, {}).get("all", [])
+                if scores and len(scores) == len(pred_captions):
+                    best_idx = scores.index(max(scores))
+                    caption = pred_captions[best_idx]
+                else:
+                    caption = pred_captions[0]
+            else:
+                caption = pred_captions[0]
+        else:
+            caption = pred_captions
+
         predictions.append({
             "image_id": img_id,
-            "caption": pred_caption.strip()
+            "caption": caption.strip()
         })
+
 
     with open(out_ref_file, "w") as f:
         json.dump({
@@ -56,9 +79,15 @@ def convert_to_coco_format(ref_path, pred_path, out_dir):
 if __name__ == "__main__" :
     import os
 
-    ref_path = os.path.expanduser("~/NSERC/samples/may22_samples/sampled_captions.json")
-    pred_path = os.path.expanduser("~/NSERC/samples/may22_samples/answered_captions.json")
-    # pred_path = os.path.expanduser("~/NSERC/samples/may22_samples/guided_answered_captions.json")
-    out_dir = os.path.expanduser("~/NSERC/samples/may22_samples/coco_json_format")
-
-    convert_to_coco_format(ref_path, pred_path, out_dir)
+    ref_path = os.path.expanduser("~/NSERC/samples/may26_samples/sampled_captions_1000.json")
+    out_dir = os.path.expanduser("~/NSERC/samples/may26_samples/coco_json_format")
+    
+    pred_path = os.path.expanduser("~/NSERC/samples/may26_samples/answered_captions_wordcap.json")
+    clip_path = os.path.expanduser("~/NSERC/samples/may26_samples/metrics/clip/unguided_wordcap_clip.json")
+    convert_to_coco_format(ref_path, pred_path, out_dir, clip_path)
+    pred_path = os.path.expanduser("~/NSERC/samples/may26_samples/guided_answered_captions_wordcap.json")
+    clip_path = os.path.expanduser("~/NSERC/samples/may26_samples/metrics/clip/guided_wordcap_clip.json")
+    convert_to_coco_format(ref_path, pred_path, out_dir, clip_path)
+    pred_path = os.path.expanduser("~/NSERC/samples/may26_samples/gaussian_answered_captions_wordcap.json")
+    clip_path = os.path.expanduser("~/NSERC/samples/may26_samples/metrics/clip/guassian_wordcap_clip.json")
+    convert_to_coco_format(ref_path, pred_path, out_dir, clip_path)
