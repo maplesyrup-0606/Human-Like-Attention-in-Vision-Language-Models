@@ -1,30 +1,57 @@
 #!/bin/bash
 
 # Slurm directives
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu:1
 #SBATCH --qos=normal
 #SBATCH --partition=a40
 #SBATCH --mem=20G
 #SBATCH --cpus-per-task=4
 #SBATCH --time=12:00:00
-#SBATCH --output=slurm_logs/output-captiongen_gaussian.log
-#SBATCH --error=slurm_logs/error-captiongen_gaussian.log 
+#SBATCH --output=slurm_logs/output_logs/output-plain.log
+#SBATCH --error=slurm_logs/error_logs/error-plain.log
+#SBATCH --mail-type=FAIL,END
+#SBATCH --mail-user=mercurymcindoe@gmail.com
 
 source /scratch/ssd004/scratch/merc0606/miniconda3/etc/profile.d/conda.sh
 conda activate NSERC
-
 
 cd ~/NSERC/LLaVA/llava/eval
 
 export PYTHONPATH=/fs01/home/merc0606/NSERC/LLaVA:$PYTHONPATH
 
+# FIXED
+SCANPATH_DIR=~/NSERC/data/scanpaths
+IMAGES_DIR=~/NSERC/data/images
+CAPTIONS_FILE_PATH=~/NSERC/data/generated_captions/sampled_captions.json
+
+# LOOP
+
+# ANSWERS_FILE_PATH=~/NSERC/data/generated_captions/jun5_samples/patch_drop_with_box_captions.json
+# WEIGHTS_DIR=~/NSERC/data/weights/patch_drop_with_box
+
+# ANSWERS_FILE_PATH=~/NSERC/data/generated_captions/jun5_samples/patch_drop_with_box_with_trajectory_captions.json
+# WEIGHTS_DIR=~/NSERC/data/weights/patch_drop_with_trajectory_with_box
+
+# ANSWERS_FILE_PATH=~/NSERC/data/generated_captions/jun5_samples/patch_drop_with_trajectory_captions.json
+# WEIGHTS_DIR=~/NSERC/data/weights/patch_drop_with_trajectory
+
+# ANSWERS_FILE_PATH=~/NSERC/data/generated_captions/jun5_samples/patch_drop_captions.json
+# WEIGHTS_DIR=~/NSERC/data/weights/patch_drop
+
+ANSWERS_FILE_PATH=~/NSERC/data/generated_captions/jun5_samples/plain_captions.json
+WEIGHTS_DIR=~/NSERC/data/weights/plain
+
+# ANSWERS_FILE_PATH=~/NSERC/data/generated_captions/jun5_samples/gaussian_captions.json
+# WEIGHTS_DIR=~/NSERC/data/weights/gaussian
+
 python -m model_cococaptions2017 \
  --model-path liuhaotian/llava-v1.5-7b \
  --load-4bit \
  --temperature 0.8 \
- --scanpath ~/NSERC/samples/may26_samples/scanpaths \
- --captions-file ~/NSERC/samples/may26_samples/sampled_captions_1000.json \
- --images-dir ~/NSERC/samples/may26_samples/sampled_images_1000 \
- --answers-file ~/NSERC/samples/may26_samples/gaussian_answered_captions_wordcap.json
+ --scanpath "$SCANPATH_DIR" \
+ --captions-file "$CAPTIONS_FILE_PATH" \
+ --images-dir "$IMAGES_DIR" \
+ --answers-file "$ANSWERS_FILE_PATH" \
+ --weights-dir "$WEIGHTS_DIR"
 
 cd ~/NSERC
