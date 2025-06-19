@@ -2,7 +2,7 @@ import os
 import json
 
 def main() :
-    ref_path = os.path.expanduser("~/NSERC/data/generated_captions/jun5_samples/sampled_captions.json")
+    ref_path = os.path.expanduser("~/NSERC/data/generated_captions/sampled_captions.json")
     pred_path = os.path.expanduser("~/NSERC/data/generated_captions/may26_samples/gaussian_answered_captions_wordcap.json")
 
     with open(ref_path, "r") as f :

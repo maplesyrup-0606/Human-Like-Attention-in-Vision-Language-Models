@@ -5,8 +5,10 @@ import torch.nn.functional as F
 import os
 import sys
 import math
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont    # ← NEW
+from tqdm import tqdm
 from matplotlib.colors import PowerNorm
+from tqdm import tqdm
 
 """
     Code which visualizes question-to-image attention at the moment.
@@ -25,7 +27,83 @@ def expand2square(pil_img, background_color) :
         result.paste(pil_img, ((height - width) // 2, 0))
         return result
 
-def output_to_image(image_dir, weight_path, save_dir) :
+def get_global_max_prob(weight_path):
+    """
+    Scan the weight file once and return the largest probability mass
+    that any image patch gets after:
+      – averaging heads and output tokens, then
+      – normalising so each map sums to 1.
+
+    Works for attn_weights shaped: tuple(token) → tuple(layer) → tensor
+    with per-layer tensors shaped either (B, H, S) or (B, H, q_len, S).
+    """
+    data = torch.load(os.path.expanduser(weight_path))
+    attn_weights, image_infos = data["attn_weights"], data["image_infos"]
+
+    global_max = 0.0
+    num_layers = len(attn_weights[0])          # 32
+
+    for batch_idx, info in tqdm(enumerate(image_infos)):
+        img_start = info["start_index"]
+        L         = info["num_patches"]
+        img_slice = slice(img_start, img_start + L)
+
+        N = len(attn_weights)                  # number of output tokens
+
+        for layer in range(num_layers):
+            summed = None
+            for tok in range(N):
+                # ---- pull tensor & unify to (H, 1, S) ----
+                t = attn_weights[tok][layer][batch_idx]      # tensor
+                if t.dim() == 2:            # (H, S)   – first layer
+                    t = t.unsqueeze(1)      # -> (H, 1, S)
+                else:                       # (H, q, S)
+                    t = t[:, -1:, :]        # last query -> (H, 1, S)
+
+                part   = t[..., img_slice]  # H × 1 × L
+                summed = part if summed is None else summed + part
+
+            avg   = (summed / N).mean(0).squeeze(0)  # L
+            probs = avg / avg.sum()                  # L, Σ=1
+            global_max = max(global_max, probs.max().item())
+
+    return global_max
+
+def save_layer_grid(layer_imgs, image_id, save_dir, cols=8):
+    """
+    layer_imgs : list[ PIL.Image ] length = #layers (32)
+    cols       : how many columns in the final grid
+    Makes a single image called f"{image_id}_all_layers.png"
+    """
+    if not layer_imgs:
+        return
+
+    w, h   = layer_imgs[0].size          # each tile size (e.g. 336×336)
+    n      = len(layer_imgs)
+    rows   = math.ceil(n / cols)
+    grid   = Image.new("RGB", (cols * w, rows * h), color=(0, 0, 0))
+
+    # Optional: nice small font for labels
+    try:
+        font = ImageFont.truetype("DejaVuSans.ttf", 18)
+    except:
+        font = None  # fallback if font missing
+
+    for idx, tile in enumerate(layer_imgs):
+        r, c = divmod(idx, cols)
+        grid.paste(tile, (c * w, r * h))
+
+        # draw tiny “L00” etc. in the corner
+        if font:
+            draw = ImageDraw.Draw(grid)
+            txt  = f"L{idx:02d}"
+            draw.text((c * w + 5, r * h + 5), txt, fill=(255, 255, 255), font=font)
+
+    out_path = os.path.join(save_dir, f"{image_id}_all_layers.png")
+    grid.save(out_path, dpi=(300, 300))
+    print(f"✅ saved {out_path}")
+
+def output_to_image(image_dir, weight_path, save_dir, global_max) :
     save_dir = os.path.join(save_dir, "out2img")
     os.makedirs(save_dir, exist_ok=True)
 
@@ -45,7 +123,7 @@ def output_to_image(image_dir, weight_path, save_dir) :
         image = expand2square(image, background_color=(0, 0, 0))
         images.append(image)
 
-    for batch_idx, image in enumerate(images) :
+    for batch_idx, image in tqdm(enumerate(images)) :
         image_id = all_image_ids[batch_idx]
         image_info = image_infos[batch_idx]
         image_start = image_info['start_index']
@@ -54,6 +132,7 @@ def output_to_image(image_dir, weight_path, save_dir) :
         side = int(math.sqrt(L))
         assert side * side == L
 
+        tiles = []
         for layer_idx in range(num_layers) :
             summed = None 
             N = len(attn_weights)
@@ -82,27 +161,31 @@ def output_to_image(image_dir, weight_path, save_dir) :
 
             # Convert image to float in [0,1]
             image_array = np.array(img_resized).astype(np.float32) / 255.0  # shape: (H, W, 3)
-           
-            gamma = 0.3
-            attn_boosted = vis ** gamma
-            attn_mask = attn_boosted[..., None]
+
+            mask2d = np.repeat(np.repeat(grid, patch_size, axis=0),
+                               patch_size, axis=1)            # (full, full)
+
+            gamma      = 0.4
+            attn_mask  = ((mask2d / global_max).clip(0, 1) ** gamma)[..., None]
 
             base_dark = image_array * 0.3
             blended = base_dark * (1 - attn_mask) + image_array * attn_mask
             blended = (blended * 255).clip(0, 255).astype(np.uint8)
 
+            tiles.append(Image.fromarray(blended)) 
 
-            # Plot the masked image
-            fig, ax = plt.subplots(figsize=(5, 5))
-            ax.imshow(blended)
-            ax.axis("off")
-            ax.set_title(f"{image_id} — Layer {layer_idx}", fontsize=10)
+            # # Plot the masked image
+            # fig, ax = plt.subplots(figsize=(5, 5))
+            # ax.imshow(blended)
+            # ax.axis("off")
+            # ax.set_title(f"{image_id} — Layer {layer_idx}", fontsize=10)
 
-            save_path = os.path.join(save_dir, f"{image_id}_{layer_idx}_out2img.png")
-            plt.tight_layout()
-            plt.savefig(save_path, dpi=300)
-            plt.close()
-            print(f"Saved Figure {image_id}")
+            # save_path = os.path.join(save_dir, f"{image_id}_{layer_idx}_out2img.png")
+            # plt.tight_layout()
+            # plt.savefig(save_path, dpi=300)
+            # plt.close()
+            # # print(f"Saved Figure {image_id}")
+        save_layer_grid(tiles, image_id, save_dir, cols=8)
 
 def question_to_image(image_dir, weight_path, save_dir): 
     save_dir = os.path.join(save_dir, "q2img")
@@ -202,11 +285,12 @@ def main() :
     image_dir = sys.argv[1]
     weight_path = sys.argv[2]
     save_dir = sys.argv[3]
-
     os.makedirs(save_dir, exist_ok=True)
 
-    output_to_image(image_dir, weight_path, save_dir)
-    question_to_image(image_dir, weight_path, save_dir)
+    gmax = get_global_max_prob(weight_path)  
+
+    output_to_image(image_dir, weight_path, save_dir, gmax)
+    # question_to_image(image_dir, weight_path, save_dir)
                 
     print("✅ Done saving weight overlay!")
 

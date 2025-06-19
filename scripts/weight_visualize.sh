@@ -18,47 +18,26 @@ cd ~/NSERC/data/scripts_for_data
 
 IMAGE_DIR=~/NSERC/data/images
 weight_paths=(
-    ~/NSERC/data/weights/patch_drop_with_box/0_weights.pt
-    ~/NSERC/data/weights/patch_drop_with_box/1_weights.pt
-
-    ~/NSERC/data/weights/patch_drop_with_trajectory/0_weights.pt
-    ~/NSERC/data/weights/patch_drop_with_trajectory/1_weights.pt
-
-    ~/NSERC/data/weights/patch_drop_with_trajectory_with_box/0_weights.pt
-    ~/NSERC/data/weights/patch_drop_with_trajectory_with_box/1_weights.pt
-
-    ~/NSERC/data/weights/patch_drop/0_weights.pt
-    ~/NSERC/data/weights/patch_drop/1_weights.pt
-
-    ~/NSERC/data/weights/gaussian/0_weights.pt
-    ~/NSERC/data/weights/gaussian/1_weights.pt
-
-    ~/NSERC/data/weights/plain/0_weights.pt
-    ~/NSERC/data/weights/plain/1_weights.pt
+    # ~/NSERC/data/weights/patch_drop/0_weights.pt
+    # ~/NSERC/data/weights/patch_drop_with_box/0_weights.pt
+    # ~/NSERC/data/weights/patch_drop_with_trajectory/0_weights.pt
+    # ~/NSERC/data/weights/patch_drop_with_trajectory_with_box/0_weights.pt
+    # ~/NSERC/data/weights/gaussian/0_weights.pt
+    # ~/NSERC/data/weights/plain/0_weights.pt
+    # ~/NSERC/data/weights/pdt_later_inject/0_weights.pt
+    ~/NSERC/data/weights/gaussian_later_inject/0_weights.pt
 )
 
 save_directories=(
-    ~/NSERC/data/weights/patch_drop_with_box/visualized_weights_0
-    ~/NSERC/data/weights/patch_drop_with_box/visualized_weights_1
-
-    ~/NSERC/data/weights/patch_drop_with_trajectory/visualized_weights_0
-    ~/NSERC/data/weights/patch_drop_with_trajectory/visualized_weights_1
-
-    ~/NSERC/data/weights/patch_drop_with_trajectory_with_box/visualized_weights_0
-    ~/NSERC/data/weights/patch_drop_with_trajectory_with_box/visualized_weights_1
-
-    ~/NSERC/data/weights/patch_drop/visualized_weights_0
-    ~/NSERC/data/weights/patch_drop/visualized_weights_1
-
-    ~/NSERC/data/weights/gaussian/visualized_weights_0
-    ~/NSERC/data/weights/gaussian/visualized_weights_1
-
-    ~/NSERC/data/weights/plain/visualized_weights_0
-    ~/NSERC/data/weights/plain/visualized_weights_1
+    # ~/NSERC/data/weights/patch_drop/
+    # ~/NSERC/data/weights/patch_drop_with_box/
+    # ~/NSERC/data/weights/patch_drop_with_trajectory/
+    # ~/NSERC/data/weights/patch_drop_with_trajectory_with_box/
+    # ~/NSERC/data/weights/gaussian/
+    # ~/NSERC/data/weights/plain/
+    # ~/NSERC/data/weights/pdt_later_inject/
+    ~/NSERC/data/weights/gaussian_later_inject/
 )
-WEIGHT_PATH=~/NSERC/data/weights/patch_drop_with_trajectory_with_box/0_weights.pt
-SAVE_DIR=~/NSERC/data/weights/patch_drop_with_trajectory_with_box/visualized_weights
-
 
 for n in ${!weight_paths[@]}; do
     echo "Running on ${weight_paths[$n]} -> ${save_directories[$n]}"
