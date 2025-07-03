@@ -2,7 +2,7 @@ import os
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-
+from pathlib import Path
 def extract_scores(rating_file_path) :
     with open(os.path.expanduser(rating_file_path)) as f :
         ratings = json.load(f)
@@ -56,6 +56,7 @@ def compare_judgements(rating_file_paths):
             bbox=dict(boxstyle="round,pad=0.3", edgecolor="gray", facecolor="white", alpha=0.7)
         )
 
+        ax.set_xlabel("Score") 
         ax.set_ylabel("Frequency")
         ax.set_title(f"{file_name} | Mean: {mean:.2f}, Median: {median:.2f}, Std: {std:.2f}")
         ax.grid(True)
@@ -70,15 +71,12 @@ def compare_judgements(rating_file_paths):
     print(f"Saved to: {save_path}")
 
 if __name__ == "__main__" :
-    file_paths = [
-        "~/NSERC/data/generated_captions/jun18_samples/llm-judge-ratings/gaussian_later_inject_captions_ratings.json",
-        "~/NSERC/data/generated_captions/jun18_samples/llm-judge-ratings/pdt_later_inject_captions_ratings.json",
-        "~/NSERC/data/generated_captions/jun5_samples/llm-judge-ratings/gaussian_captions_ratings.json",
-        "~/NSERC/data/generated_captions/jun5_samples/llm-judge-ratings/patch_drop_captions_ratings.json",
-        "~/NSERC/data/generated_captions/jun5_samples/llm-judge-ratings/patch_drop_with_box_captions_ratings.json", 
-        "~/NSERC/data/generated_captions/jun5_samples/llm-judge-ratings/patch_drop_with_box_with_trajectory_captions_ratings.json",
-        "~/NSERC/data/generated_captions/jun5_samples/llm-judge-ratings/patch_drop_with_trajectory_captions_ratings.json",
-        "~/NSERC/data/generated_captions/jun5_samples/llm-judge-ratings/plain_captions_ratings.json",
-    ]
+    files = Path("~/NSERC/data/generated_captions/jun26_samples/llm-judge-ratings").expanduser()
+
+    file_paths = sorted(
+        str(p)
+        for p in files.glob("*_ratings.json")
+        if "summary" not in p.name
+    )       
 
     compare_judgements(file_paths)

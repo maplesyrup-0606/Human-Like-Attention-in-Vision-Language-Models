@@ -39,17 +39,15 @@ conda activate internvl
 
 # kill $SERVER_PID
 
-GT_CAPTIONS=~/NSERC/data/generated_captions/sampled_captions.json 
-SAVE_DIR=~/NSERC/data/generated_captions/jun18_samples/
+GT_CAPTIONS=~/NSERC/data/generated_captions/CUB_captions/CUB_captions.json
+SAVE_DIR=~/NSERC/data/generated_captions/jun26_samples/llm-judge-ratings
 gen_captions=(
-    # ~/NSERC/data/generated_captions/jun5_samples/plain_captions.json
-    # ~/NSERC/data/generated_captions/jun5_samples/gaussian_captions.json
-    # ~/NSERC/data/generated_captions/jun5_samples/patch_drop_captions.json
-    # ~/NSERC/data/generated_captions/jun5_samples/patch_drop_with_trajectory_captions.json
-    # ~/NSERC/data/generated_captions/jun5_samples/patch_drop_with_box_captions.json
-    # ~/NSERC/data/generated_captions/jun5_samples/patch_drop_with_box_with_trajectory_captions.json
-    # ~/NSERC/data/generated_captions/jun18_samples/generated_captions/pdt_later_inject_captions.json
-    ~/NSERC/data/generated_captions/jun18_samples/generated_captions/gaussian_later_inject_captions.json
+    # ~/NSERC/data/generated_captions/jun26_samples/generated_captions/cub/plain_captions.json
+    ~/NSERC/data/generated_captions/jun26_samples/generated_captions/cub/pd_last_captions.json
+    ~/NSERC/data/generated_captions/jun26_samples/generated_captions/cub/pdm_last_captions.json
+    ~/NSERC/data/generated_captions/jun26_samples/generated_captions/cub/pdt_last_captions.json
+    ~/NSERC/data/generated_captions/jun26_samples/generated_captions/cub/pdtm_last_captions.json
+    ~/NSERC/data/generated_captions/jun26_samples/generated_captions/cub/gaussian_last_captions.json
 )
 
 cd ~/NSERC/eval/captions/llm-as-a-judge

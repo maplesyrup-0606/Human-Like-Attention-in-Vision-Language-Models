@@ -8,7 +8,8 @@ import math
 from PIL import Image, ImageDraw, ImageFont    # ← NEW
 from tqdm import tqdm
 from matplotlib.colors import PowerNorm
-
+import glob
+from pathlib import Path
 """
     Code which visualizes question-to-image attention at the moment.
 """
@@ -99,8 +100,9 @@ def save_layer_grid(layer_imgs, image_id, save_dir, cols=8):
             draw.text((c * w + 5, r * h + 5), txt, fill=(255, 255, 255), font=font)
 
     out_path = os.path.join(save_dir, f"{image_id}_all_layers.png")
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)   # ensure sub-folder
     grid.save(out_path, dpi=(300, 300))
-    print(f"✅ saved {out_path}")
+    print("✅ saved", out_path)
 
 def output_to_image(image_dir, weight_path, save_dir, global_max) :
     save_dir = os.path.join(save_dir, "out2img")
@@ -116,12 +118,15 @@ def output_to_image(image_dir, weight_path, save_dir, global_max) :
 
     # get all images associated with batch and process them to 336 x 336
     images = []
-    for image_id in all_image_ids :
-        image_path = os.path.join(os.path.expanduser(image_dir), image_id + ".jpg")
-        image = Image.open(image_path)
-        image = expand2square(image, background_color=(0, 0, 0))
-        images.append(image)
+    root = Path(image_dir).expanduser()
 
+    for image_id in all_image_ids:
+        img_path = root / f"{image_id}.jpg"       # root / 117.Clay... / Clay....
+        if not img_path.exists():
+            raise FileNotFoundError(img_path)
+        img = expand2square(Image.open(img_path), background_color=(0, 0, 0))
+        images.append(img)
+    
     for batch_idx, image in tqdm(enumerate(images), total=len(images)) :
         image_id = all_image_ids[batch_idx]
         image_info = image_infos[batch_idx]
@@ -185,101 +190,7 @@ def output_to_image(image_dir, weight_path, save_dir, global_max) :
             # plt.close()
             # # print(f"Saved Figure {image_id}")
         save_layer_grid(tiles, image_id, save_dir, cols=8)
-
-def question_to_image(image_dir, weight_path, save_dir): 
-    save_dir = os.path.join(save_dir, "q2img")
-    os.makedirs(save_dir, exist_ok=True)
-    
-    # get data for corresponding batch
-    data = torch.load(os.path.expanduser(weight_path))
-    attn_weights, image_infos, all_image_ids = data['attn_weights'][0], data['image_infos'], data['all_image_ids']
-
-    # get all images associated with batch and process them to 336 x 336
-    images = []
-    for image_id in all_image_ids :
-        image_path = os.path.join(os.path.expanduser(image_dir), image_id + ".jpg")
-        image = Image.open(image_path)
-        image = expand2square(image, background_color=(0, 0, 0))
-        images.append(image)
-    
-    # collect question-to-image weights for each image
-    for batch_idx, image in enumerate(images) :
-        image_id = all_image_ids[batch_idx]
-
-        for layer_idx in range(len(attn_weights)) :
-            all_heads_attn = attn_weights[layer_idx][batch_idx]
-            sq_len = all_heads_attn.shape[-1]
-
-            image_start = image_infos[batch_idx]['start_index']
-            image_len = image_infos[batch_idx]['num_patches']
-            image_end = image_start + image_len
-
-            image_indices = list(range(image_start, image_end))
-
-            question_span_1 = list(range(0, image_start))
-            question_span_2 = list(range(image_end, sq_len))
-            question_indices = question_span_1 + question_span_2
-
-            # question - to - image token
-            attn_q_to_img_all_heads = all_heads_attn[:, question_indices, :][:, :, image_indices] # H x Q x I
-            avg_attn = attn_q_to_img_all_heads.mean(dim=(0, 1)) # I
-            
-            side = int(image_len ** 0.5)
-            assert side * side == image_len 
-            # —————— PLOT & SAVE THE RAW PATCH‐LEVEL HEATMAP ——————
-            attn_map = avg_attn.reshape(side, side).cpu().numpy()  # shape (side, side)
-
-            patch_size = 14
-
-            # 2. Resize the square image so that its size = (side * patch_size, side * patch_size).
-            full_size = side * patch_size  # e.g. 24 * 14 = 336
-            image_resized = image.resize((full_size, full_size), resample=Image.BILINEAR)
-
-            # 3. Normalize attn_map to sum to 1 (probability)
-            attn_sum = attn_map.sum()
-            if attn_sum > 1e-6:
-                attn_norm = attn_map / attn_sum
-            else:
-                attn_norm = np.zeros_like(attn_map)
-
-            # === REFACTORED VISUALIZATION: patch-wise upscaling via np.repeat ===
-            patch_size = 14
-            side = attn_norm.shape[0]
-            full_size = side * patch_size  # e.g. 24 * 14 = 336
-
-            # 4. Upscale each patch into a patch_size×patch_size block
-            attn_patch_vis = np.repeat(
-                np.repeat(attn_norm, patch_size, axis=0),
-                patch_size, axis=1
-            )  # shape: (full_size, full_size)
-
-            # 5. Resize original image to match full_size
-            image_resized = image.resize((full_size, full_size), Image.BILINEAR)
-
-            image_array = np.array(image_resized).astype(np.float32) / 255.0  # (336, 336, 3)
-            
-            gamma = 0.3
-            attn_boosted = attn_patch_vis ** gamma
-            attn_mask = attn_boosted[..., None]
-
-            base_dark = image_array * 0.3
-            blended = base_dark * (1 - attn_mask) + image_array * attn_mask 
-            blended = (blended * 255).clip(0, 255).astype(np.uint8)
-
-
-            # Plot and save
-            fig, ax = plt.subplots(figsize=(5, 5))
-            ax.imshow(blended)
-            ax.axis("off")
-            ax.set_title(f"{image_id} — Layer {layer_idx}", fontsize=10)
-
-            save_path = os.path.join(save_dir, f"{image_id}_{layer_idx}_q2img.png")
-            plt.tight_layout()
-            plt.savefig(save_path, dpi=300)
-            plt.close()
-            print(f"Saved Figure {image_id}")
-            
-
+  
 def main() :
     image_dir = sys.argv[1]
     weight_path = sys.argv[2]
@@ -289,7 +200,6 @@ def main() :
     gmax = get_global_max_prob(weight_path)  
 
     output_to_image(image_dir, weight_path, save_dir, gmax)
-    # question_to_image(image_dir, weight_path, save_dir)
                 
     print("✅ Done saving weight overlay!")
 

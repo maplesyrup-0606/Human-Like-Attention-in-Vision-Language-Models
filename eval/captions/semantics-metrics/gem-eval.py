@@ -4,10 +4,11 @@ import sys
 import json
 import matplotlib.pyplot as plt
 sys.path.append("../../../../GEM-metrics")
-
+import argparse
+from pathlib import Path
 import gem_metrics
 
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 
 def format_for_gem(ref_captions: Dict, pred_captions: Dict) -> Tuple[Dict, Dict]:
     """
@@ -30,14 +31,25 @@ def format_for_gem(ref_captions: Dict, pred_captions: Dict) -> Tuple[Dict, Dict]
         "language": "en"
     }
 
-    for image_id, gt_caption in ref_captions.items():
-        # Assume each ID has one GT caption; repeat it 4 times for comparison
-        for _ in range(4):
-            ref_gem["values"].append({"target": gt_caption})
+    common_ids = set(ref_captions) & set(pred_captions)
+    if not common_ids:
+        raise ValueError("No overlapping image IDs between reference and predictions")
 
-    for image_id, preds in pred_captions.items():
-        for pred in preds:
-            pred_gem["values"].append(pred)
+    for img_id in common_ids:
+        gt_list = ref_captions[img_id]         # list[str]
+        preds   = pred_captions[img_id]        # list[str]
+        k       = len(preds)
+
+        # deterministically repeat / truncate the GT list to length k
+        if len(gt_list) >= k:
+            refs_for_id = gt_list[:k]
+        else:
+            repeats, remain = divmod(k, len(gt_list))
+            refs_for_id = gt_list * repeats + gt_list[:remain]
+
+        # add to GEM containers
+        ref_gem["values"].extend({"target": ref} for ref in refs_for_id)
+        pred_gem["values"].extend(preds)
 
     return ref_gem, pred_gem
 
@@ -54,7 +66,7 @@ def run_gem_eval_with_tempfiles(ref_gem, pred_gem):
         pred_gem_t = gem_metrics.texts.Predictions(pred_temp.name)
         ref_gem_t = gem_metrics.texts.References(ref_temp.name)
 
-        result = gem_metrics.compute(pred_gem_t, ref_gem_t, metrics_list=['bleu', 'rouge', 'bertscore'])
+        result = gem_metrics.compute(pred_gem_t, ref_gem_t, metrics_list=['bleu', 'rouge', 'bertscore', 'cider'])
 
     # Remove temp files
     os.remove(ref_temp.name)
@@ -62,76 +74,74 @@ def run_gem_eval_with_tempfiles(ref_gem, pred_gem):
 
     return result
 
-def main() :
-    ref_path = os.path.expanduser("~/NSERC/data/generated_captions/sampled_captions.json")
-    pred_paths = [
-        os.path.expanduser("~/NSERC/data/generated_captions/jun5_samples/generated_captions/gaussian_captions.json"),
-        os.path.expanduser("~/NSERC/data/generated_captions/jun5_samples/generated_captions/patch_drop_captions.json"),
-        os.path.expanduser("~/NSERC/data/generated_captions/jun5_samples/generated_captions/patch_drop_with_box_captions.json"),
-        os.path.expanduser("~/NSERC/data/generated_captions/jun5_samples/generated_captions/patch_drop_with_box_with_trajectory_captions.json"),
-        os.path.expanduser("~/NSERC/data/generated_captions/jun5_samples/generated_captions/patch_drop_with_trajectory_captions.json"),
-        os.path.expanduser("~/NSERC/data/generated_captions/jun5_samples/generated_captions/plain_captions.json"),
-        os.path.expanduser("~/NSERC/data/generated_captions/jun18_samples/generated_captions/pdt_later_inject_captions.json"),
-        os.path.expanduser("~/NSERC/data/generated_captions/jun18_samples/generated_captions/gaussian_later_inject_captions.json"),
-    ]
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ref",        required=True,
+                        help="Ground-truth caption JSON (one caption per image‐id)")
+    parser.add_argument("--pred-dir",   required=True,
+                        help="Directory containing *.json prediction files to evaluate")
+    parser.add_argument("--save-dir",   required=True,
+                        help="Where to write gem_summary.json and plots")
+    args = parser.parse_args()
 
-    ref_dict = json.load(open(ref_path, "r"))
-    save_dir = os.path.expanduser("~/NSERC/data/generated_captions/jun18_samples/semantics")
-    os.makedirs(save_dir, exist_ok=True)
+    ref_path   = Path(os.path.expanduser(args.ref))
+    pred_root  = Path(os.path.expanduser(args.pred_dir))
+    save_root  = Path(os.path.expanduser(args.save_dir))
+    save_root.mkdir(parents=True, exist_ok=True)
+
+    # ----- load reference once ------------------------------------------------
+    with ref_path.open() as f:
+        ref_dict = json.load(f)
+
+    # ----- discover prediction files -----------------------------------------
+    pred_files = sorted(pred_root.glob("*.json"))
+    if not pred_files:
+        raise FileNotFoundError(f"No *.json caption files found in {pred_root}")
 
     ret_dict = {}
-    for pred_path in pred_paths :
-        pred_dict = json.load(open(pred_path, "r"))    
-        base_name = os.path.basename(pred_path)
- 
-        file_name = os.path.splitext(base_name)[0]
-        ref_gem, pred_gem = format_for_gem(ref_captions=ref_dict, pred_captions=pred_dict)
+    for pf in pred_files:
+        method = pf.stem                      # filename without .json
+        print(f"→ {method}")
 
+        with pf.open() as f:
+            pred_dict = json.load(f)
+        
+        ref_gem, pred_gem = format_for_gem(ref_dict, pred_dict)
         result = run_gem_eval_with_tempfiles(ref_gem, pred_gem)
-        ret_dict[f"{file_name}"] = result
+        ret_dict[method] = result
 
-    json.dump(ret_dict, open(os.path.join(save_dir, "gem_summary.json"), "w"), indent=2)
-    
-    # now let's visualize
+    # ----- dump summary -------------------------------------------------------
+    with (save_root / "gem_summary.json").open("w") as f:
+        json.dump(ret_dict, f, indent=2)
+
+    # ----- plotting -----------------------------------------------------------
     metric_keys = {
-        "bleu": "BLEU",
-        "bertscore_f1": "BERTScore (F1)",
-        "rouge1": "ROUGE-1 (F1)",
-        "rouge2": "ROUGE-2 (F1)",
-        "rougeL": "ROUGE-L (F1)"
+        "bleu":       ("BLEU",              lambda r: r["bleu"]),
+        "bertscore":  ("BERTScore (F1)",    lambda r: r["bertscore"]["f1"]),
+        "rouge1":     ("ROUGE-1 (F1)",      lambda r: r["rouge1"]["fmeasure"]),
+        "rouge2":     ("ROUGE-2 (F1)",      lambda r: r["rouge2"]["fmeasure"]),
+        "rougeL":     ("ROUGE-L (F1)",      lambda r: r["rougeL"]["fmeasure"]),
+        "cider":      ("CIDEr",             lambda r: r["CIDEr"]),
     }
 
-    scores_by_metric = {k : {} for k in metric_keys}
-    
-    for method_name, result in ret_dict.items() :
-        scores_by_metric["bleu"][method_name] = result["bleu"]
-        scores_by_metric["bertscore_f1"][method_name] = result["bertscore"]["f1"]
-        scores_by_metric["rouge1"][method_name] = result["rouge1"]["fmeasure"]
-        scores_by_metric["rouge2"][method_name] = result["rouge2"]["fmeasure"]
-        scores_by_metric["rougeL"][method_name] = result["rougeL"]["fmeasure"]
+    for key, (title, getter) in metric_keys.items():
+        pairs = [(m, getter(ret_dict[m])) for m in ret_dict]      # list of tuples
+        pairs.sort(key=lambda t: t[1], reverse=True)              # ↓  highest-to-lowest
+        methods, vals = zip(*pairs)  
 
-    for metric_key, display_name in metric_keys.items() :
-        methods = list(scores_by_metric[metric_key].keys())
-        values = [scores_by_metric[metric_key][m] for m in methods]
-
-        plt.figure(figsize=(10, 5))
-        bars = plt.bar(methods, values, color="skyblue", edgecolor="black")
+        plt.figure(figsize=(max(6, 0.6*len(methods)), 4))
+        bars = plt.bar(methods, vals, color="skyblue", edgecolor="black")
         plt.xticks(rotation=30, ha="right")
-        plt.ylabel("Score")
-        plt.title(f"{display_name} Comparison Across Models")
+        plt.ylabel("Score");   plt.title(f"{title} comparison")
 
-        # Annotate scores
-        for bar, value in zip(bars, values):
-            plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.005,
-                    f"{value:.3f}", ha="center", va="bottom", fontsize=9)
+        for b, v in zip(bars, vals):
+            plt.text(b.get_x()+b.get_width()/2, b.get_height()+0.004,
+                     f"{v:.3f}", ha="center", va="bottom", fontsize=8)
 
-        plt.tight_layout()
-        plt.grid(axis="y", linestyle="--", alpha=0.5)
-
-        save_path = os.path.join(save_dir, f"{metric_key}_comparison.png")
-        plt.savefig(save_path)
+        plt.tight_layout();  plt.grid(axis="y", ls="--", alpha=0.4)
+        plt.savefig(save_root / f"{key}_comparison.png")
         plt.close()
-        print(f"Saved: {save_path}")
+        print("Saved plot:", save_root / f"{key}_comparison.png")
 
 
 if __name__ == "__main__" :
