@@ -4,3 +4,7 @@
 [submodule "HAT"]
 	path = HAT
 	url = git@github.com:maplesyrup-0606/HAT.git
+[submodule "POPE"]
+	path = POPE
+	url = git@github.com:maplesyrup-0606/POPE.git
+	branch = main
