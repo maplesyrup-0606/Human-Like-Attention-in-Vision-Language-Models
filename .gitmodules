@@ -4,7 +4,15 @@
 [submodule "HAT"]
 	path = HAT
 	url = git@github.com:maplesyrup-0606/HAT.git
-[submodule "POPE"]
-	path = POPE
+[submodule "eval/captions/hallucination/eval/captions/hallucination/POPE"]
+	path = eval/captions/hallucination/eval/captions/hallucination/POPE
 	url = git@github.com:maplesyrup-0606/POPE.git
+	branch = main
+[submodule "eval/captions/hallucination/POPE"]
+	path = eval/captions/hallucination/POPE
+	url = git@github.com:maplesyrup-0606/POPE.git
+	branch = main
+[submodule "eval/captions/hallucination/CHAIR-metric-standalone"]
+	path = eval/captions/hallucination/CHAIR-metric-standalone
+	url = git@github.com:maplesyrup-0606/CHAIR-metric-standalone.git
 	branch = main
