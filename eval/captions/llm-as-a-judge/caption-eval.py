@@ -6,7 +6,7 @@ import random
 
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from judge_prompt import JUDGE_PROMPT  # assumes this is a string template
+from judge_prompt import JUDGE_PROMPT, CLAIR_BASE_PROMPT # assumes this is a string template
 
 def generate_judgments(gt_path, gen_path, save_dir):
     file_name = os.path.basename(gen_path)
@@ -43,8 +43,8 @@ def generate_judgments(gt_path, gen_path, save_dir):
         gt_caption = gt_captions[image_id]
         inputs = []
         for gen_caption in gen_captions[image_id]:
-            prompt = JUDGE_PROMPT.format(groundtruths=gt_caption, generated=gen_caption)
-
+            # prompt = JUDGE_PROMPT.format(groundtruths=gt_caption, generated=gen_caption)
+            prompt = CLAIR_BASE_PROMPT.format(groundtruth=gt_caption, generated=[gen_caption])
             messages = [{"role": "user", "content": prompt}]
             text = tokenizer.apply_chat_template(
                 messages,

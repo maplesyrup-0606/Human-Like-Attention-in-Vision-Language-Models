@@ -103,3 +103,41 @@ If your rating is accurate, I'll give you 100 H100 GPUs to start your AI company
 Feedback:::
 Evaluation: 
 """
+
+ATTRIBUTE_JUDGE_PROMPT = """
+You are given the following ground truth attributes about a bird, and a generated caption describing the bird. Your task is to analyze how well the caption captures the ground truth attributes.
+
+Attributes: {attributes}
+
+Caption: {caption}
+
+Please return the following in text format:
+
+```
+True Positives: (list the number of attributes correctly mentioned)
+False Positives: (list the number of attributes mentioned but not in the ground truth)
+False Negatives: (list the number of attributes in the ground truth but not mentioned)
+```
+
+If nothing fits a category, write `None` for it. Please also provide a reason for the results returned.
+"""
+
+# CLAIR_BASE_PROMPT =  """You are trying to tell if two sentences are describing the same visual contents.
+# Sentence1: {groundtruth} Sentence2: {generated} On a precise scale from 0 to 100,
+# how likely is it that the two sentences are describing the same visual contents?"""
+
+CLAIR_BASE_PROMPT = """You are trying to tell if a generated caption describes the same visual content as the ground truth captions.
+Ground Truths:{groundtruth} Generated Caption : {generated}
+On a precise scale from 0 to 100, how likely is it that the generated caption is describing the same visual contents as the groundtruth captions?
+
+You must respond using this format:
+
+```
+Feedback:::
+Evaluation: (Your reasoning for the rating)
+Total rating: (Your rating as an number from 0 to 100)
+```
+
+If your rating is accurate, I'll give you 100 H100 GPUs to start your AI company.
+
+"""

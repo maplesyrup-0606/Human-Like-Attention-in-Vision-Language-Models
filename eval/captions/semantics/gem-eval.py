@@ -3,7 +3,7 @@ import tempfile
 import sys
 import json
 import matplotlib.pyplot as plt
-sys.path.append("../../../../GEM-metrics")
+sys.path.append("./GEM-metrics")
 import argparse
 from pathlib import Path
 import gem_metrics
@@ -101,7 +101,7 @@ def main():
     ret_dict = {}
     for pf in pred_files:
         method = pf.stem                      # filename without .json
-        print(f"→ {method}")
+        print(f"→ {method}", flush=True)
 
         with pf.open() as f:
             pred_dict = json.load(f)
@@ -129,7 +129,7 @@ def main():
         pairs.sort(key=lambda t: t[1], reverse=True)              # ↓  highest-to-lowest
         methods, vals = zip(*pairs)  
 
-        plt.figure(figsize=(max(6, 0.6*len(methods)), 4))
+        plt.figure(figsize=(max(6, 0.6*len(methods)), 6))
         bars = plt.bar(methods, vals, color="skyblue", edgecolor="black")
         plt.xticks(rotation=30, ha="right")
         plt.ylabel("Score");   plt.title(f"{title} comparison")

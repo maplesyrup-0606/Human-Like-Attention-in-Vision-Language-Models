@@ -15,7 +15,13 @@ conda activate clip
 
 cd ~/NSERC/eval/captions/semantics-metrics
 
+# python clip-eval.py \
+#     --images ~/NSERC/data/images/CUB_200_2011/CUB_200_2011/images \
+#     --captions-dir ~/NSERC/data/generated_captions/jun26_samples/generated_captions/cub \
+#     --save-dir ~/NSERC/data/generated_captions/jun26_samples/semantics \
+#     --ground-truth-captions ~/NSERC/data/generated_captions/CUB_captions/CUB_captions.json
 python clip-eval.py \
-    --images ~/NSERC/data/CUB_200_2011/CUB_200_2011/images \
-    --captions-dir ~/NSERC/data/generated_captions/jun26_samples/generated_captions/cub \
-    --save-dir ~/NSERC/data/generated_captions/jun26_samples/semantics
+    --images ~/NSERC/data/images/MSCOCO_images \
+    --captions-dir ~/NSERC/data/generated_captions/jul18_samples/generated_captions/mscoco \
+    --save-dir ~/NSERC/data/generated_captions/jul18_samples/semantics/mscoco \
+    --ground-truth-captions ~/NSERC/data/generated_captions/sampled_captions.json

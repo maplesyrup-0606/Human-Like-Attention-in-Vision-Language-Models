@@ -19,36 +19,34 @@ cd ~/NSERC/LLaVA/llava/eval
 
 export PYTHONPATH=/fs01/home/merc0606/NSERC/LLaVA:$PYTHONPATH
 
-RUN_NAME=test_run
 # FIXED
 SCANPATH_DIR=~/NSERC/data/scanpaths/cub_scanpaths
-IMAGES_DIR=~/NSERC/data/CUB_200_2011/CUB_200_2011/images
+IMAGES_DIR=~/NSERC/data/images/CUB_200_2011/CUB_200_2011/images
 CAPTIONS_FILE_PATH=~/NSERC/data/generated_captions/CUB_captions/CUB_captions.json
 
 runs=(
     # RUN_NAME, TYPE, MARGIN, TRAJECTORY_MODE, TARGET_LAYER
-    # "plain,None,0,0," 
-    "plain_force_bird,None,0,0," 
+    # "plain-old-prompt,None,0,0,45" 
+    # "salient_post_sm_gaussian-old-prompt,salient-head,0,0," 
     # "pd,non-gaussian,0,0,"
     # "pdm,non-gaussian,1,0,"
     # "pdt,non-gaussian,0,1,"
     # "pdtm,non-gaussian,1,1,"
     # "gaussian,gaussian,0,0,"
+    # "pd-new-prompt,non-gaussian,0,0,"
+    # "pdm-new-prompt,non-gaussian,1,0,"
+    # "pdt-new-prompt,non-gaussian,0,1,"
+    # "pdtm-new-prompt,non-gaussian,1,1,"
+    # "gaussian-new-prompt,gaussian,0,0,"
+    # "salient_heads_with_zero_out,salient-head,0,0,"
+    # "salient_heads_relative,salient-head,0,0,"
+    "salient_heads_relative-k-8,salient-head,0,0,"
 )
-
-# runs=(
-#     # RUN_NAME, TYPE, MARGIN, TRAJECTORY_MODE, TARGET_LAYER
-#     "pd_last,non-gaussian,0,0,31"
-#     "pdm_last,non-gaussian,1,0,31"
-#     "pdt_last,non-gaussian,0,1,31"
-#     "pdtm_last,non-gaussian,1,1,31"
-#     "gaussian_last,gaussian,0,0,31"
-# )
 
 for run in "${runs[@]}"; do
     IFS="," read -r RUN_NAME TYPE MARGIN TRAJECTORY_MODE TARGET_LAYER <<< "$run"
 
-    ANSWERS_FILE_PATH=~/NSERC/data/generated_captions/jun26_samples/generated_captions/cub/${RUN_NAME}_captions.json
+    ANSWERS_FILE_PATH=~/NSERC/data/generated_captions/jul18_samples/generated_captions/cub/${RUN_NAME}.json
     WEIGHTS_DIR=~/NSERC/data/weights/cub/${RUN_NAME}
     mkdir -p "$WEIGHTS_DIR"
 

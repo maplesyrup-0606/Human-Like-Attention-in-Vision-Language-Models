@@ -133,4 +133,3 @@ dependencies:
       - uvicorn==0.34.2
       - wavedrom==2.0.3.post3
       - websockets==11.0.3
-prefix: /scratch/ssd004/scratch/merc0606/miniconda3/envs/llava
