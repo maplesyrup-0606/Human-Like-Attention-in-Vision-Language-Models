@@ -16,3 +16,7 @@
 	path = eval/captions/hallucination/CHAIR-metric-standalone
 	url = git@github.com:maplesyrup-0606/CHAIR-metric-standalone.git
 	branch = main
+[submodule "eval/captions/semantics/GEM-metrics"]
+	path = eval/captions/semantics/GEM-metrics
+	url = git@github.com:GEM-benchmark/GEM-metrics.git
+	branch = main
