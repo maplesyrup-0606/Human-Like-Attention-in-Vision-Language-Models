@@ -16,6 +16,8 @@ Install conda environment via :
 conda env create -f env.yml
 ```
 
+Most actions can be done with the conda environment `NSERC`. Others are used for metric scripts, look at `/scripts` for other conda environments.
+
 ### Data
 ---
 The `data` directory contains all datasets, generated outputs, and analysis scripts used for evaluation.
