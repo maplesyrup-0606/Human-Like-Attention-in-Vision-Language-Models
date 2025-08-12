@@ -1,0 +1,53 @@
+{
+  "force_bird_gaussian_captions_ratings": {
+    "mean": 2.93
+  },
+  "force_bird_pd_captions_ratings": {
+    "mean": 2.86
+  },
+  "force_bird_pdm_captions_ratings": {
+    "mean": 2.99
+  },
+  "force_bird_pdt_captions_ratings": {
+    "mean": 2.87
+  },
+  "force_bird_pdtm_captions_ratings": {
+    "mean": 3.0
+  },
+  "force_bird_plain_captions_ratings": {
+    "mean": 2.96
+  },
+  "gaussian_captions_ratings": {
+    "mean": 2.86
+  },
+  "gaussian_last_captions_ratings": {
+    "mean": 2.71
+  },
+  "pd_captions_ratings": {
+    "mean": 2.68
+  },
+  "pd_last_captions_ratings": {
+    "mean": 2.76
+  },
+  "pdm_captions_ratings": {
+    "mean": 2.85
+  },
+  "pdm_last_captions_ratings": {
+    "mean": 2.7
+  },
+  "pdt_captions_ratings": {
+    "mean": 2.8
+  },
+  "pdt_last_captions_ratings": {
+    "mean": 2.72
+  },
+  "pdtm_captions_ratings": {
+    "mean": 2.91
+  },
+  "pdtm_last_captions_ratings": {
+    "mean": 2.71
+  },
+  "plain_captions_ratings": {
+    "mean": 2.76
+  }
+}

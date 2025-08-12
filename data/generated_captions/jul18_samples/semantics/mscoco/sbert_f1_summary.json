@@ -1,0 +1,46 @@
+{
+  "plain_captions": {
+    "mean": 0.6283345818519592,
+    "std": 0.08201032876968384
+  },
+  "salient_post_sm_gaussian_captions": {
+    "mean": 0.6320064663887024,
+    "std": 0.08268824964761734
+  },
+  "salient_post_sm_gaussian_layer_19_captions": {
+    "mean": 0.6206867694854736,
+    "std": 0.08515600860118866
+  },
+  "salient_post_sm_gaussian_layer_20_captions": {
+    "mean": 0.6322652697563171,
+    "std": 0.08086050301790237
+  },
+  "salient_post_sm_gaussian_layer_21_captions": {
+    "mean": 0.6289533376693726,
+    "std": 0.08306751400232315
+  },
+  "salient_post_sm_gaussian_layer_22_captions": {
+    "mean": 0.6260953545570374,
+    "std": 0.08494124561548233
+  },
+  "salient_post_sm_gaussian_layer_23_captions": {
+    "mean": 0.6252546906471252,
+    "std": 0.08320049941539764
+  },
+  "salient_post_sm_gaussian_layer_24_captions": {
+    "mean": 0.6302322745323181,
+    "std": 0.08374565839767456
+  },
+  "salient_post_sm_gaussian_layer_25_captions": {
+    "mean": 0.6274319887161255,
+    "std": 0.08272294700145721
+  },
+  "salient_post_sm_gaussian_layer_26_captions": {
+    "mean": 0.628556489944458,
+    "std": 0.08308025449514389
+  },
+  "salient_pre_sm_gaussian_captions": {
+    "mean": 0.5898047089576721,
+    "std": 0.1132594496011734
+  }
+}

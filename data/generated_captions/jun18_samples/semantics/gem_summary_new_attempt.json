@@ -1,0 +1,194 @@
+{
+  "plain_captions": {
+    "predictions_file": "/tmp/tmpte26l7k4.json",
+    "N": 4000,
+    "references_file": "/tmp/tmp8zxe2b1g.json",
+    "bertscore": {
+      "precision": 0.86743,
+      "recall": 0.87723,
+      "f1": 0.87027
+    },
+    "rouge1": {
+      "precision": 0.4955,
+      "recall": 0.54525,
+      "fmeasure": 0.5072
+    },
+    "rouge2": {
+      "precision": 0.22645,
+      "recall": 0.25078,
+      "fmeasure": 0.23111
+    },
+    "rougeL": {
+      "precision": 0.44042,
+      "recall": 0.48719,
+      "fmeasure": 0.45161
+    },
+    "rougeLsum": {
+      "precision": 0.44042,
+      "recall": 0.48719,
+      "fmeasure": 0.45161
+    },
+    "CIDEr": 0.68774,
+    "bleu": 18.15573
+  },
+  "patch_drop_traj_at-first_10_captions": {
+    "predictions_file": "/tmp/tmpl27x4a5q.json",
+    "N": 4000,
+    "references_file": "/tmp/tmpg8jkhj_v.json",
+    "bertscore": {
+      "precision": 0.85688,
+      "recall": 0.87582,
+      "f1": 0.86408
+    },
+    "rouge1": {
+      "precision": 0.45849,
+      "recall": 0.55415,
+      "fmeasure": 0.48731
+    },
+    "rouge2": {
+      "precision": 0.20348,
+      "recall": 0.25067,
+      "fmeasure": 0.2165
+    },
+    "rougeL": {
+      "precision": 0.40405,
+      "recall": 0.49253,
+      "fmeasure": 0.43075
+    },
+    "rougeLsum": {
+      "precision": 0.40405,
+      "recall": 0.49253,
+      "fmeasure": 0.43075
+    },
+    "CIDEr": 0.59994,
+    "bleu": 15.63213
+  },
+  "patch_drop_traj_at-start_captions": {
+    "predictions_file": "/tmp/tmptchf2lfg.json",
+    "N": 4000,
+    "references_file": "/tmp/tmpzahkl0l7.json",
+    "bertscore": {
+      "precision": 0.86493,
+      "recall": 0.87667,
+      "f1": 0.86862
+    },
+    "rouge1": {
+      "precision": 0.48943,
+      "recall": 0.54592,
+      "fmeasure": 0.50308
+    },
+    "rouge2": {
+      "precision": 0.22374,
+      "recall": 0.2513,
+      "fmeasure": 0.22902
+    },
+    "rougeL": {
+      "precision": 0.43457,
+      "recall": 0.48735,
+      "fmeasure": 0.44744
+    },
+    "rougeLsum": {
+      "precision": 0.43457,
+      "recall": 0.48735,
+      "fmeasure": 0.44744
+    },
+    "CIDEr": 0.6662,
+    "bleu": 17.57296
+  },
+  "patch_drop_traj_at-middle_captions": {
+    "predictions_file": "/tmp/tmpgaod15ax.json",
+    "N": 4000,
+    "references_file": "/tmp/tmprhpw0604.json",
+    "bertscore": {
+      "precision": 0.86626,
+      "recall": 0.87712,
+      "f1": 0.86962
+    },
+    "rouge1": {
+      "precision": 0.49329,
+      "recall": 0.5476,
+      "fmeasure": 0.50747
+    },
+    "rouge2": {
+      "precision": 0.22512,
+      "recall": 0.25152,
+      "fmeasure": 0.23077
+    },
+    "rougeL": {
+      "precision": 0.43663,
+      "recall": 0.48671,
+      "fmeasure": 0.44975
+    },
+    "rougeLsum": {
+      "precision": 0.43663,
+      "recall": 0.48671,
+      "fmeasure": 0.44975
+    },
+    "CIDEr": 0.69067,
+    "bleu": 17.86997
+  },
+  "patch_drop_traj_at-end_captions": {
+    "predictions_file": "/tmp/tmp5zz96adn.json",
+    "N": 4000,
+    "references_file": "/tmp/tmpnmcbze_w.json",
+    "bertscore": {
+      "precision": 0.86814,
+      "recall": 0.8772,
+      "f1": 0.87059
+    },
+    "rouge1": {
+      "precision": 0.50136,
+      "recall": 0.54267,
+      "fmeasure": 0.50942
+    },
+    "rouge2": {
+      "precision": 0.23159,
+      "recall": 0.25182,
+      "fmeasure": 0.23428
+    },
+    "rougeL": {
+      "precision": 0.44735,
+      "recall": 0.48693,
+      "fmeasure": 0.45552
+    },
+    "rougeLsum": {
+      "precision": 0.44735,
+      "recall": 0.48693,
+      "fmeasure": 0.45552
+    },
+    "CIDEr": 0.69457,
+    "bleu": 18.60026
+  },
+  "patch_drop_traj_at-last_8_captions": {
+    "predictions_file": "/tmp/tmpz0rmx97z.json",
+    "N": 4000,
+    "references_file": "/tmp/tmpruzdmsbk.json",
+    "bertscore": {
+      "precision": 0.86773,
+      "recall": 0.87631,
+      "f1": 0.86996
+    },
+    "rouge1": {
+      "precision": 0.49976,
+      "recall": 0.54163,
+      "fmeasure": 0.50773
+    },
+    "rouge2": {
+      "precision": 0.23002,
+      "recall": 0.25037,
+      "fmeasure": 0.2326
+    },
+    "rougeL": {
+      "precision": 0.44442,
+      "recall": 0.48413,
+      "fmeasure": 0.45236
+    },
+    "rougeLsum": {
+      "precision": 0.44442,
+      "recall": 0.48413,
+      "fmeasure": 0.45236
+    },
+    "CIDEr": 0.69084,
+    "bleu": 18.3862
+  }
+}

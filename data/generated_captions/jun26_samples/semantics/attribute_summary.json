@@ -1,0 +1,14 @@
+{
+  "force_bird_pdtm_captions": 0.017397320729392422,
+  "gaussian_captions": 0.016234942980543808,
+  "pdt_captions": 0.016630198076307372,
+  "plain_captions": 0.016095173998656183,
+  "force_bird_gaussian_captions": 0.01841498713826433,
+  "pd_captions": 0.014350691680229344,
+  "force_bird_plain_captions": 0.018382249803532258,
+  "force_bird_pdt_captions": 0.016978240145568493,
+  "pdm_captions": 0.01672635954210253,
+  "force_bird_pd_captions": 0.013900487287408538,
+  "pdtm_captions": 0.017071711167844065,
+  "force_bird_pdm_captions": 0.017647524521324592
+}

@@ -1,0 +1,188 @@
+{
+  "gaussian_captions": {
+    "predictions_file": "/tmp/tmph_tw3rfx.json",
+    "N": 4000,
+    "references_file": "/tmp/tmpr8f3df21.json",
+    "bertscore": {
+      "precision": 0.86687,
+      "recall": 0.87644,
+      "f1": 0.86954
+    },
+    "rouge1": {
+      "precision": 0.4972,
+      "recall": 0.54184,
+      "fmeasure": 0.50657
+    },
+    "rouge2": {
+      "precision": 0.22934,
+      "recall": 0.25129,
+      "fmeasure": 0.2327
+    },
+    "rougeL": {
+      "precision": 0.442,
+      "recall": 0.48439,
+      "fmeasure": 0.45125
+    },
+    "rougeLsum": {
+      "precision": 0.442,
+      "recall": 0.48439,
+      "fmeasure": 0.45125
+    },
+    "bleu": 18.18705
+  },
+  "patch_drop_captions": {
+    "predictions_file": "/tmp/tmpngq5zzin.json",
+    "N": 4000,
+    "references_file": "/tmp/tmprsudopix.json",
+    "bertscore": {
+      "precision": 0.82586,
+      "recall": 0.84002,
+      "f1": 0.83095
+    },
+    "rouge1": {
+      "precision": 0.38713,
+      "recall": 0.44679,
+      "fmeasure": 0.40224
+    },
+    "rouge2": {
+      "precision": 0.1443,
+      "recall": 0.16885,
+      "fmeasure": 0.14978
+    },
+    "rougeL": {
+      "precision": 0.34248,
+      "recall": 0.39862,
+      "fmeasure": 0.35711
+    },
+    "rougeLsum": {
+      "precision": 0.34248,
+      "recall": 0.39862,
+      "fmeasure": 0.35711
+    },
+    "bleu": 9.76874
+  },
+  "patch_drop_with_box_captions": {
+    "predictions_file": "/tmp/tmp5jg07si8.json",
+    "N": 4000,
+    "references_file": "/tmp/tmpaf07bkj2.json",
+    "bertscore": {
+      "precision": 0.84957,
+      "recall": 0.86951,
+      "f1": 0.85731
+    },
+    "rouge1": {
+      "precision": 0.44255,
+      "recall": 0.53569,
+      "fmeasure": 0.47179
+    },
+    "rouge2": {
+      "precision": 0.1921,
+      "recall": 0.23868,
+      "fmeasure": 0.20596
+    },
+    "rougeL": {
+      "precision": 0.38986,
+      "recall": 0.47636,
+      "fmeasure": 0.41717
+    },
+    "rougeLsum": {
+      "precision": 0.38986,
+      "recall": 0.47636,
+      "fmeasure": 0.41717
+    },
+    "bleu": 14.64473
+  },
+  "patch_drop_with_box_with_trajectory_captions": {
+    "predictions_file": "/tmp/tmpbfv2w63d.json",
+    "N": 4000,
+    "references_file": "/tmp/tmpumf7bcfw.json",
+    "bertscore": {
+      "precision": 0.85147,
+      "recall": 0.87149,
+      "f1": 0.85923
+    },
+    "rouge1": {
+      "precision": 0.45248,
+      "recall": 0.54422,
+      "fmeasure": 0.48074
+    },
+    "rouge2": {
+      "precision": 0.19942,
+      "recall": 0.24314,
+      "fmeasure": 0.21187
+    },
+    "rougeL": {
+      "precision": 0.39982,
+      "recall": 0.48519,
+      "fmeasure": 0.42628
+    },
+    "rougeLsum": {
+      "precision": 0.39982,
+      "recall": 0.48519,
+      "fmeasure": 0.42628
+    },
+    "bleu": 15.24333
+  },
+  "patch_drop_with_trajectory_captions": {
+    "predictions_file": "/tmp/tmp6rpe0x87.json",
+    "N": 4000,
+    "references_file": "/tmp/tmpqvq92sk1.json",
+    "bertscore": {
+      "precision": 0.84286,
+      "recall": 0.861,
+      "f1": 0.84981
+    },
+    "rouge1": {
+      "precision": 0.43027,
+      "recall": 0.50967,
+      "fmeasure": 0.45302
+    },
+    "rouge2": {
+      "precision": 0.18316,
+      "recall": 0.21969,
+      "fmeasure": 0.19249
+    },
+    "rougeL": {
+      "precision": 0.37935,
+      "recall": 0.454,
+      "fmeasure": 0.40101
+    },
+    "rougeLsum": {
+      "precision": 0.37935,
+      "recall": 0.454,
+      "fmeasure": 0.40101
+    },
+    "bleu": 13.29877
+  },
+  "plain_captions": {
+    "predictions_file": "/tmp/tmpop49n4sy.json",
+    "N": 4000,
+    "references_file": "/tmp/tmp02bwykva.json",
+    "bertscore": {
+      "precision": 0.86743,
+      "recall": 0.87723,
+      "f1": 0.87027
+    },
+    "rouge1": {
+      "precision": 0.4955,
+      "recall": 0.54525,
+      "fmeasure": 0.5072
+    },
+    "rouge2": {
+      "precision": 0.22645,
+      "recall": 0.25078,
+      "fmeasure": 0.23111
+    },
+    "rougeL": {
+      "precision": 0.44042,
+      "recall": 0.48719,
+      "fmeasure": 0.45161
+    },
+    "rougeLsum": {
+      "precision": 0.44042,
+      "recall": 0.48719,
+      "fmeasure": 0.45161
+    },
+    "bleu": 18.15573
+  }
+}

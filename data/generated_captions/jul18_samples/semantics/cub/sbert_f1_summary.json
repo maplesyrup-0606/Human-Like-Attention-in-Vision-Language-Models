@@ -1,0 +1,34 @@
+{
+  "baseline": {
+    "mean": 0.5759168863296509,
+    "std": 0.061088643968105316
+  },
+  "non_salient_head_to_salient_head-k-4": {
+    "mean": 0.5577101111412048,
+    "std": 0.05803820863366127
+  },
+  "non_salient_head_to_salient_head": {
+    "mean": 0.5527470707893372,
+    "std": 0.05430128052830696
+  },
+  "salient_head": {
+    "mean": 0.5782815217971802,
+    "std": 0.05789634585380554
+  },
+  "salient_head_to_non_salient_head-k-4": {
+    "mean": 0.5805619359016418,
+    "std": 0.05869980901479721
+  },
+  "salient_heads_relative-k-8": {
+    "mean": 0.5782023072242737,
+    "std": 0.05913839861750603
+  },
+  "salient_heads_relative": {
+    "mean": 0.5767940878868103,
+    "std": 0.05908884480595589
+  },
+  "zero_out_salient_heads": {
+    "mean": 0.5561277866363525,
+    "std": 0.056193795055150986
+  }
+}
