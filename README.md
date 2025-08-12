@@ -16,7 +16,7 @@ Install conda environment via :
 conda env create -f env.yml
 ```
 
-Most actions can be done with the conda environment `NSERC`. Others are used for metric scripts, look at `/scripts` for other conda environments.
+Most actions can be done with the conda environment `NSERC`. Others are used for metric scripts, look at [`/scripts`](#scripts) for other conda environments.
 
 ### Data
 ---
@@ -128,7 +128,7 @@ Model used to generate human gaze scanpaths for each image.
 ---
 Vision-Language Model (VLM) used for experimentation.
 
-- **`modifications/`** — Contains code for attention manipulation.
+- **[`modifications/`](/NSERC/LLaVA/modifications/README.md)** — Contains code for attention manipulation.
   - `modeling_llama.py` — Implementation of the LLaMA model. Attention manipulation logic is located in `LLaMAModel`, `LLaMADecoderLayer`, and `LLaMAAttention`.
   - `kwargs_modification.py` — Utility for argument bypassing.
 ### Scripts
