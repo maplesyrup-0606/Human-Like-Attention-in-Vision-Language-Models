@@ -4,6 +4,13 @@ Project repository for NSERC summer 2025 \
 **Author ⭐️: Mercury Mcindoe** \
 **Team 🏀: [Mercury Mcindoe (UBC, BASC)](https://mercurymcindoe.notion.site), [Wan-Cyuan (Chris) Fan (UBC, PHD)](https://sites.google.com/view/wancyuanfan), [Rayat Hossain (UBC, PHD)](https://sites.google.com/view/mirrayatimtiazhossain/home), [Xiangteng He (UBC, PostDoc)](https://hexiangteng.github.io), [Leonid Sigal (UBC, PI)](https://www.cs.ubc.ca/~lsigal/)**
 
+### Getting Started
+---
+Welcome 🤗 This is the project repository to my summer research project. Start with the following command to clone the repository and the submodules within:
+```bash
+git clone --recurse-submodules <repo-url>
+```
+
 ### Conda Environments
 ---
 The Conda environments required for running various scripts (metrics, sampling, etc.) are located in the `conda_envs` directory.
