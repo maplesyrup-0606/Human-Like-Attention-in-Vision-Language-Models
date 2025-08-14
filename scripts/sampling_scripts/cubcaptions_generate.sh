@@ -12,42 +12,49 @@
 #SBATCH --output=slurm_logs/output_logs/output-caption_sampling.log
 #SBATCH --error=slurm_logs/error_logs/error-caption_sampling.log
 
-source /scratch/ssd004/scratch/merc0606/miniconda3/etc/profile.d/conda.sh
+if command -v conda &>/dev/null; then
+  eval "$(conda shell.bash hook)"
+elif [[ -n "${CONDA_EXE:-}" ]]; then
+  CONDA_BASE="$("$CONDA_EXE" info --base 2>/dev/null)" || true
+  if [[ -n "${CONDA_BASE:-}" && -r "$CONDA_BASE/etc/profile.d/conda.sh" ]]; then
+    # shellcheck disable=SC1090
+    source "$CONDA_BASE/etc/profile.d/conda.sh"
+    eval "$(conda shell.bash hook)" || true
+  fi
+fi
+if ! command -v conda &>/dev/null; then
+  echo "ERROR: conda not found. Please load it first." >&2
+  exit 1
+fi
 conda activate NSERC
 
-cd ~/NSERC/LLaVA/llava/eval
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd )"
+if REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then :; else
+  REPO_ROOT="$(realpath "$SCRIPT_DIR/../..")"
+fi
 
-export PYTHONPATH=/fs01/home/merc0606/NSERC/LLaVA:$PYTHONPATH
+cd "$REPO_ROOT/LLaVA/llava/eval"
 
-# FIXED
-SCANPATH_DIR=~/NSERC/data/scanpaths/cub_scanpaths
-IMAGES_DIR=~/NSERC/data/images/CUB_200_2011/CUB_200_2011/images
-CAPTIONS_FILE_PATH=~/NSERC/data/generated_captions/CUB_captions/CUB_captions.json
+export PYTHONPATH="$REPO_ROOT/LLaVA:${PYTHONPATH:-}"
+
+SCANPATH_DIR="$REPO_ROOT/data/scanpaths/cub_scanpaths"
+IMAGES_DIR="$REPO_ROOT/data/images/CUB_200_2011/CUB_200_2011/images"
+CAPTIONS_FILE_PATH="$REPO_ROOT/data/generated_captions/CUB_captions/CUB_captions.json"
+DEST_DIR=jul30_samples
 
 runs=(
-    # RUN_NAME, TYPE, MARGIN, TRAJECTORY_MODE, TARGET_LAYER
-    # "plain-old-prompt,None,0,0,45" 
-    # "salient_post_sm_gaussian-old-prompt,salient-head,0,0," 
-    # "pd,non-gaussian,0,0,"
-    # "pdm,non-gaussian,1,0,"
-    # "pdt,non-gaussian,0,1,"
-    # "pdtm,non-gaussian,1,1,"
-    # "gaussian,gaussian,0,0,"
-    # "pd-new-prompt,non-gaussian,0,0,"
-    # "pdm-new-prompt,non-gaussian,1,0,"
-    # "pdt-new-prompt,non-gaussian,0,1,"
-    # "pdtm-new-prompt,non-gaussian,1,1,"
-    # "gaussian-new-prompt,gaussian,0,0,"
-    # "salient_heads_with_zero_out,salient-head,0,0,"
-    # "salient_heads_relative,salient-head,0,0,"
-    "salient_heads_relative-k-8,salient-head,0,0,"
+    "pd-new-prompt,non-gaussian,0,0,"
+    "pdm-new-prompt,non-gaussian,1,0,"
+    "pdt-new-prompt,non-gaussian,0,1,"
+    "pdtm-new-prompt,non-gaussian,1,1,"
+    "gaussian-new-prompt,gaussian,0,0,"
 )
 
 for run in "${runs[@]}"; do
     IFS="," read -r RUN_NAME TYPE MARGIN TRAJECTORY_MODE TARGET_LAYER <<< "$run"
 
-    ANSWERS_FILE_PATH=~/NSERC/data/generated_captions/jul18_samples/generated_captions/cub/${RUN_NAME}.json
-    WEIGHTS_DIR=~/NSERC/data/weights/cub/${RUN_NAME}
+    ANSWERS_FILE_PATH="$REPO_ROOT/data/generated_captions/${DEST_DIR}/generated_captions/cub/${RUN_NAME}.json"
+    WEIGHTS_DIR="$REPO_ROOT/data/weights/cub/${RUN_NAME}"
     mkdir -p "$WEIGHTS_DIR"
 
     echo "Running $RUN_NAME (type=$TYPE margin=$MARGIN trajectory=$TRAJECTORY_MODE target_layer=$TARGET_LAYER)"
@@ -69,4 +76,4 @@ for run in "${runs[@]}"; do
         $( [[ -n $TARGET_LAYER ]] && echo --target-layer "$TARGET_LAYER" )
 done
 
-cd ~/NSERC
+cd "$REPO_ROOT"

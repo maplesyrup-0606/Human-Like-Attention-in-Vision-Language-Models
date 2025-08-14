@@ -1,0 +1,14 @@
+{
+  "plain_captions": {
+    "mean": 0.6006845831871033,
+    "std": 0.05955155938863754
+  },
+  "salient_heads-original-prompts": {
+    "mean": 0.6021587252616882,
+    "std": 0.05829489976167679
+  },
+  "salient_heads_relative-original-prompts": {
+    "mean": 0.604353666305542,
+    "std": 0.05624757707118988
+  }
+}

@@ -12,17 +12,37 @@
 #SBATCH --output=slurm_logs/output_logs/output-caption_sampling.log
 #SBATCH --error=slurm_logs/error_logs/error-caption_sampling.log
 
-source /scratch/ssd004/scratch/merc0606/miniconda3/etc/profile.d/conda.sh
+if command -v conda &>/dev/null; then
+  eval "$(conda shell.bash hook)"
+elif [[ -n "${CONDA_EXE:-}" ]]; then
+  CONDA_BASE="$("$CONDA_EXE" info --base 2>/dev/null)" || true
+  if [[ -n "${CONDA_BASE:-}" && -r "$CONDA_BASE/etc/profile.d/conda.sh" ]]; then
+    # shellcheck disable=SC1090
+    source "$CONDA_BASE/etc/profile.d/conda.sh"
+    eval "$(conda shell.bash hook)" || true
+  fi
+fi
+if ! command -v conda &>/dev/null; then
+  echo "ERROR: conda not found on PATH and CONDA_EXE not set. Load your conda module first." >&2
+  exit 1
+fi
 conda activate NSERC
 
-cd ~/NSERC/LLaVA/llava/eval
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd )"
+if REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then :; else
+  REPO_ROOT="$(realpath "$SCRIPT_DIR/../..")"
+fi
 
-export PYTHONPATH=/fs01/home/merc0606/NSERC/LLaVA:$PYTHONPATH
+# Move to original working directory (LLaVA/llava/eval), but via repo root
+cd "$REPO_ROOT/LLaVA/llava/eval"
+
+# Make PYTHONPATH repo-relative (no hardcoded /fs01/... path)
+export PYTHONPATH="$REPO_ROOT/LLaVA:${PYTHONPATH:-}"
 
 # FIXED
-SCANPATH_DIR=~/NSERC/data/scanpaths/coco_scanpaths
-IMAGES_DIR=~/NSERC/data/images/MSCOCO_images
-CAPTIONS_FILE_PATH=~/NSERC/data/generated_captions/sampled_captions.json
+SCANPATH_DIR="$REPO_ROOT/data/scanpaths/coco_scanpaths"
+IMAGES_DIR="$REPO_ROOT/data/images/MSCOCO_images"
+CAPTIONS_FILE_PATH="$REPO_ROOT/data/generated_captions/sampled_captions.json"
 
 runs=(
     # RUN_NAME, TYPE, MARGIN, TRAJECTORY_MODE, TARGET_LAYER
@@ -44,14 +64,13 @@ runs=(
     # "salient_post_sm_gaussian_layer_26,None,0,0,26"
     # "salient_head,salient-head,0,0,-1"
     "salient_heads_relative-k-8,salient-head,0,0,"
-
 )
 
 for run in "${runs[@]}"; do
     IFS="," read -r RUN_NAME TYPE MARGIN TRAJECTORY_MODE TARGET_LAYER <<< "$run"
 
-    ANSWERS_FILE_PATH=~/NSERC/data/generated_captions/jul30_samples/generated_captions/mscoco/${RUN_NAME}_captions.json
-    WEIGHTS_DIR=~/NSERC/data/weights/mscoco/${RUN_NAME}
+    ANSWERS_FILE_PATH="$REPO_ROOT/data/generated_captions/jul30_samples/generated_captions/mscoco/${RUN_NAME}_captions.json"
+    WEIGHTS_DIR="$REPO_ROOT/data/weights/mscoco/${RUN_NAME}"
     mkdir -p "$WEIGHTS_DIR"
 
     echo "Running $RUN_NAME (type=$TYPE margin=$MARGIN trajectory=$TRAJECTORY_MODE target_layer=$TARGET_LAYER)"

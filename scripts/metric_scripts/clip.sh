@@ -10,18 +10,38 @@
 #SBATCH --output=slurm_logs/output_logs/output-clipsore.log
 #SBATCH --error=slurm_logs/error_logs/error-clipscore.log 
 
-source /scratch/ssd004/scratch/merc0606/miniconda3/etc/profile.d/conda.sh
+set -euo pipefail
+IFS=$'\n\t'
+
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd )"
+if REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then
+  :
+else
+  REPO_ROOT="$(realpath "$SCRIPT_DIR/../..")"
+fi
+
+if command -v conda &>/dev/null; then
+  eval "$(conda shell.bash hook)"
+elif [[ -r "/scratch/ssd004/scratch/merc0606/miniconda3/etc/profile.d/conda.sh" ]]; then
+  # original path (kept as fallback)
+  # shellcheck disable=SC1091
+  source /scratch/ssd004/scratch/merc0606/miniconda3/etc/profile.d/conda.sh
+fi
 conda activate clip
 
-cd ~/NSERC/eval/captions/semantics-metrics
+SEMANTICS_DIR="$REPO_ROOT/eval/captions/semantics"
+cd "$SEMANTICS_DIR"
+
+DEST_DIR="jul18_samples"
+
+python clip-eval.py \
+    --images "$REPO_ROOT/data/images/CUB_200_2011/CUB_200_2011/images" \
+    --captions-dir "$REPO_ROOT/data/generated_captions/${DEST_DIR}/generated_captions/cub" \
+    --save-dir "$REPO_ROOT/data/generated_captions/${DEST_DIR}/semantics" \
+    --ground-truth-captions "$REPO_ROOT/data/generated_captions/CUB_captions/CUB_captions.json"
 
 # python clip-eval.py \
-#     --images ~/NSERC/data/images/CUB_200_2011/CUB_200_2011/images \
-#     --captions-dir ~/NSERC/data/generated_captions/jun26_samples/generated_captions/cub \
-#     --save-dir ~/NSERC/data/generated_captions/jun26_samples/semantics \
-#     --ground-truth-captions ~/NSERC/data/generated_captions/CUB_captions/CUB_captions.json
-python clip-eval.py \
-    --images ~/NSERC/data/images/MSCOCO_images \
-    --captions-dir ~/NSERC/data/generated_captions/jul18_samples/generated_captions/mscoco \
-    --save-dir ~/NSERC/data/generated_captions/jul18_samples/semantics/mscoco \
-    --ground-truth-captions ~/NSERC/data/generated_captions/sampled_captions.json
+#     --images "$REPO_ROOT/data/images/MSCOCO_images" \
+#     --captions-dir "$REPO_ROOT/data/generated_captions/jul18_samples/generated_captions/mscoco" \
+#     --save-dir "$REPO_ROOT/data/generated_captions/jul18_samples/semantics/mscoco" \
+#     --ground-truth-captions "$REPO_ROOT/data/generated_captions/sampled_captions.json"
