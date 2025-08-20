@@ -14,11 +14,21 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd )"
-if REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then
+# Prefer the directory sbatch was invoked from (SLURM-safe); fall back to PWD
+SUBMIT_DIR="${SLURM_SUBMIT_DIR:-$PWD}"
+
+# Try to find the repo root from the submit dir; fall back to walking up
+if REPO_ROOT="$(git -C "$SUBMIT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then
   :
 else
-  REPO_ROOT="$(realpath "$SCRIPT_DIR/../..")"
+  REPO_ROOT="$SUBMIT_DIR"
+  # Walk up a few levels until we spot a repo marker (HAT/ or .git/)
+  for _ in 1 2 3 4 5 6; do
+    [[ -d "$REPO_ROOT/HAT" || -d "$REPO_ROOT/.git" ]] && break
+    PARENT="$(dirname "$REPO_ROOT")"
+    [[ "$PARENT" == "$REPO_ROOT" ]] && break
+    REPO_ROOT="$PARENT"
+  done
 fi
 
 IMAGE_ROOT="$(realpath "$REPO_ROOT/data/CUB_200_2011/CUB_200_2011/images")"

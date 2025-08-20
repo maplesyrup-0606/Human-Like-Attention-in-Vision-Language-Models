@@ -12,6 +12,28 @@
 #SBATCH --output=slurm_logs/output_logs/output-caption_sampling.log
 #SBATCH --error=slurm_logs/error_logs/error-caption_sampling.log
 
+set -euo pipefail
+IFS=$'\n\t'
+
+SUBMIT_DIR="${SLURM_SUBMIT_DIR:-$PWD}"
+
+if REPO_ROOT="$(git -C "$SUBMIT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then
+  :
+else
+  REPO_ROOT="$SUBMIT_DIR"
+  for _ in 1 2 3 4 5; do
+    if [[ -d "$REPO_ROOT/LLaVA" || -d "$REPO_ROOT/.git" ]]; then
+      break
+    fi
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
+fi
+
+if [[ ! -d "$REPO_ROOT/LLaVA" ]]; then
+  echo "ERROR: Could not locate repo root from SUBMIT_DIR='$SUBMIT_DIR'." >&2
+  exit 1
+fi
+
 if command -v conda &>/dev/null; then
   eval "$(conda shell.bash hook)"
 elif [[ -n "${CONDA_EXE:-}" ]]; then
@@ -23,15 +45,11 @@ elif [[ -n "${CONDA_EXE:-}" ]]; then
   fi
 fi
 if ! command -v conda &>/dev/null; then
-  echo "ERROR: conda not found. Please load it first." >&2
+  echo "ERROR: conda not found. Load/init conda first." >&2
   exit 1
 fi
-conda activate NSERC
 
-SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd )"
-if REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then :; else
-  REPO_ROOT="$(realpath "$SCRIPT_DIR/../..")"
-fi
+conda activate NSERC
 
 cd "$REPO_ROOT/LLaVA/llava/eval"
 
@@ -43,11 +61,12 @@ CAPTIONS_FILE_PATH="$REPO_ROOT/data/generated_captions/CUB_captions/CUB_captions
 DEST_DIR=jul30_samples
 
 runs=(
-    "pd-new-prompt,non-gaussian,0,0,"
-    "pdm-new-prompt,non-gaussian,1,0,"
-    "pdt-new-prompt,non-gaussian,0,1,"
-    "pdtm-new-prompt,non-gaussian,1,1,"
-    "gaussian-new-prompt,gaussian,0,0,"
+#    "pd-new-prompt,non-gaussian,0,0,"
+#    "pdm-new-prompt,non-gaussian,1,0,"
+#    "pdt-new-prompt,non-gaussian,0,1,"
+#    "pdtm-new-prompt,non-gaussian,1,1,"
+#    "gaussian-new-prompt,gaussian,0,0,"
+     "salient-head-new-norm,salient-head,0,0,"
 )
 
 for run in "${runs[@]}"; do
@@ -59,7 +78,7 @@ for run in "${runs[@]}"; do
 
     echo "Running $RUN_NAME (type=$TYPE margin=$MARGIN trajectory=$TRAJECTORY_MODE target_layer=$TARGET_LAYER)"
 
-    python -m model_CUB \
+    python model_CUB.py \
         --model-path  liuhaotian/llava-v1.5-7b \
         --load-4bit \
         --temperature 0.8 \

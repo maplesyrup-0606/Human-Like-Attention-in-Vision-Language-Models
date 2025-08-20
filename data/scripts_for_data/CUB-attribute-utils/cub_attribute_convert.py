@@ -1,4 +1,4 @@
-import os, json, re 
+import os, json, re, csv
 from pathlib import Path 
 import matplotlib.pyplot as plt
 
@@ -34,8 +34,8 @@ def extract_tp_fp_fn(text):
     return TP, FP, FN
 
 def main() :
-    attributes_root = Path("~/NSERC/data/generated_captions/jul18_samples/attributes_eval").expanduser()
-    save_path = Path("~/NSERC/data/generated_captions/jul18_samples/attributes_eval/").expanduser()
+    attributes_root = Path("~/Human-Like-Attention-in-Vision-Language-Models/data/generated_captions/jul18_samples/attributes_eval").expanduser()
+    save_path = Path("~/Human-Like-Attention-in-Vision-Language-Models/data/generated_captions/jul18_samples/attributes_eval/").expanduser()
     ret = {}
     for judgement_path in attributes_root.glob("*.json") :
         with open(judgement_path, "r") as f:
@@ -72,9 +72,16 @@ def main() :
                     }
     
     sorted_methods = sorted(method_to_avg.items(), key=lambda x: x[1], reverse=True)
-
+    
     # Unpack into two lists for plotting
     methods, avg_f1s = zip(*sorted_methods)
+
+    csv_path = save_path / "avg_f1_scores.csv"
+    with open(csv_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Method", "Average_Max_F1"])
+        writer.writerows(sorted_methods)
+    print(f"✅ Saved CSV to {csv_path}")
 
     # Plot
     plt.figure(figsize=(10, 6))

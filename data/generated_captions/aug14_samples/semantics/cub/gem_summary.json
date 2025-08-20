@@ -1,10 +1,15 @@
 {
   "baseline": {
-    "predictions_file": "/tmp/tmphvdqlf2k.json",
+    "predictions_file": "/tmp/tmp4_n7c25u.json",
     "N": 1000,
-    "references_file": "/tmp/tmplht61ddn.json",
-    "bleu": 0.6064,
+    "references_file": "/tmp/tmp48n891qe.json",
     "CIDEr": 0.0002,
+    "bleu": 0.6064,
+    "bertscore": {
+      "precision": 0.69476,
+      "recall": 0.76845,
+      "f1": 0.72953
+    },
     "rouge1": {
       "precision": 0.10014,
       "recall": 0.41554,
@@ -24,19 +29,19 @@
       "precision": 0.07814,
       "recall": 0.32853,
       "fmeasure": 0.12365
-    },
-    "bertscore": {
-      "precision": 0.69476,
-      "recall": 0.76845,
-      "f1": 0.72953
     }
   },
   "gaussian-new-prompt": {
-    "predictions_file": "/tmp/tmp_mzq7785.json",
+    "predictions_file": "/tmp/tmpxggzey4s.json",
     "N": 1000,
-    "references_file": "/tmp/tmp1r_5igpw.json",
-    "bleu": 0.47749,
+    "references_file": "/tmp/tmp_g2lewwj.json",
     "CIDEr": 0.00095,
+    "bleu": 0.47749,
+    "bertscore": {
+      "precision": 0.68945,
+      "recall": 0.77134,
+      "f1": 0.72784
+    },
     "rouge1": {
       "precision": 0.09104,
       "recall": 0.43988,
@@ -56,19 +61,19 @@
       "precision": 0.07019,
       "recall": 0.34577,
       "fmeasure": 0.11295
-    },
-    "bertscore": {
-      "precision": 0.68945,
-      "recall": 0.77134,
-      "f1": 0.72784
     }
   },
   "pd-new-prompt": {
-    "predictions_file": "/tmp/tmpcmci0u64.json",
+    "predictions_file": "/tmp/tmpbgp2xsvr.json",
     "N": 1000,
-    "references_file": "/tmp/tmpbuxo7_5a.json",
-    "bleu": 0.58059,
+    "references_file": "/tmp/tmpgmsmqq0d.json",
     "CIDEr": 0.0049,
+    "bleu": 0.58059,
+    "bertscore": {
+      "precision": 0.69666,
+      "recall": 0.76565,
+      "f1": 0.72918
+    },
     "rouge1": {
       "precision": 0.10835,
       "recall": 0.39874,
@@ -88,19 +93,19 @@
       "precision": 0.08586,
       "recall": 0.31906,
       "fmeasure": 0.12576
-    },
-    "bertscore": {
-      "precision": 0.69666,
-      "recall": 0.76565,
-      "f1": 0.72918
     }
   },
   "pdm-new-prompt": {
-    "predictions_file": "/tmp/tmpfxvl1397.json",
+    "predictions_file": "/tmp/tmpn7zt5h3h.json",
     "N": 1000,
-    "references_file": "/tmp/tmp308zuutd.json",
-    "bleu": 0.67054,
+    "references_file": "/tmp/tmp5yo38ep_.json",
     "CIDEr": 0.00041,
+    "bleu": 0.67054,
+    "bertscore": {
+      "precision": 0.69964,
+      "recall": 0.78325,
+      "f1": 0.73882
+    },
     "rouge1": {
       "precision": 0.09892,
       "recall": 0.45541,
@@ -120,19 +125,19 @@
       "precision": 0.07604,
       "recall": 0.35629,
       "fmeasure": 0.12172
-    },
-    "bertscore": {
-      "precision": 0.69964,
-      "recall": 0.78325,
-      "f1": 0.73882
     }
   },
   "pdt-new-prompt": {
-    "predictions_file": "/tmp/tmpykak9vpn.json",
+    "predictions_file": "/tmp/tmp2wl_hspj.json",
     "N": 1000,
-    "references_file": "/tmp/tmpekkrf2yi.json",
-    "bleu": 0.63403,
+    "references_file": "/tmp/tmp92yvlacn.json",
     "CIDEr": 0.00236,
+    "bleu": 0.63403,
+    "bertscore": {
+      "precision": 0.70001,
+      "recall": 0.77616,
+      "f1": 0.73585
+    },
     "rouge1": {
       "precision": 0.10632,
       "recall": 0.42397,
@@ -152,19 +157,19 @@
       "precision": 0.08285,
       "recall": 0.33389,
       "fmeasure": 0.12718
-    },
-    "bertscore": {
-      "precision": 0.70001,
-      "recall": 0.77616,
-      "f1": 0.73585
     }
   },
   "pdtm-new-prompt": {
-    "predictions_file": "/tmp/tmpfcnl8m04.json",
+    "predictions_file": "/tmp/tmptn4w25uu.json",
     "N": 1000,
-    "references_file": "/tmp/tmpe8_gwa3x.json",
-    "bleu": 0.63962,
+    "references_file": "/tmp/tmpra2ana5_.json",
     "CIDEr": 0.00084,
+    "bleu": 0.63962,
+    "bertscore": {
+      "precision": 0.69914,
+      "recall": 0.78314,
+      "f1": 0.73849
+    },
     "rouge1": {
       "precision": 0.0984,
       "recall": 0.45399,
@@ -184,19 +189,51 @@
       "precision": 0.0753,
       "recall": 0.35481,
       "fmeasure": 0.12052
-    },
+    }
+  },
+  "salient-head-new-norm": {
+    "predictions_file": "/tmp/tmp2re9k8zo.json",
+    "N": 1000,
+    "references_file": "/tmp/tmp02z16uag.json",
+    "CIDEr": 0.00068,
+    "bleu": 0.57326,
     "bertscore": {
-      "precision": 0.69914,
-      "recall": 0.78314,
-      "f1": 0.73849
+      "precision": 0.69498,
+      "recall": 0.76768,
+      "f1": 0.72931
+    },
+    "rouge1": {
+      "precision": 0.10119,
+      "recall": 0.41449,
+      "fmeasure": 0.15914
+    },
+    "rouge2": {
+      "precision": 0.01537,
+      "recall": 0.07003,
+      "fmeasure": 0.02465
+    },
+    "rougeL": {
+      "precision": 0.07805,
+      "recall": 0.32363,
+      "fmeasure": 0.12311
+    },
+    "rougeLsum": {
+      "precision": 0.07805,
+      "recall": 0.32363,
+      "fmeasure": 0.12311
     }
   },
   "salient_head": {
-    "predictions_file": "/tmp/tmp9865cik1.json",
+    "predictions_file": "/tmp/tmp6pskdprb.json",
     "N": 1000,
-    "references_file": "/tmp/tmp4d6c41au.json",
-    "bleu": 0.5892,
+    "references_file": "/tmp/tmp2l_6gxwt.json",
     "CIDEr": 0.00063,
+    "bleu": 0.5892,
+    "bertscore": {
+      "precision": 0.69442,
+      "recall": 0.76761,
+      "f1": 0.72897
+    },
     "rouge1": {
       "precision": 0.09999,
       "recall": 0.41654,
@@ -216,19 +253,19 @@
       "precision": 0.07734,
       "recall": 0.32663,
       "fmeasure": 0.12266
-    },
-    "bertscore": {
-      "precision": 0.69442,
-      "recall": 0.76761,
-      "f1": 0.72897
     }
   },
   "salient_heads_relative": {
-    "predictions_file": "/tmp/tmpq40y2szd.json",
+    "predictions_file": "/tmp/tmp50fopf3d.json",
     "N": 1000,
-    "references_file": "/tmp/tmpfgesj469.json",
-    "bleu": 0.60026,
+    "references_file": "/tmp/tmp5r43ch8i.json",
     "CIDEr": 0.00015,
+    "bleu": 0.60026,
+    "bertscore": {
+      "precision": 0.69479,
+      "recall": 0.76763,
+      "f1": 0.72919
+    },
     "rouge1": {
       "precision": 0.09989,
       "recall": 0.4097,
@@ -248,11 +285,6 @@
       "precision": 0.07771,
       "recall": 0.32326,
       "fmeasure": 0.12268
-    },
-    "bertscore": {
-      "precision": 0.69479,
-      "recall": 0.76763,
-      "f1": 0.72919
     }
   }
 }

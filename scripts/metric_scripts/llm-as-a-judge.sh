@@ -23,30 +23,31 @@ echo "CUDA_VISIBLE_DEVICES = ${CUDA_VISIBLE_DEVICES:-}"
 which nvcc || true
 python -c "import torch; print(torch.version.cuda); print(torch.cuda.is_available()); import torch as _t; print(_t.cuda.get_device_name(0) if _t.cuda.is_available() else 'no cuda')"
 
-# ----------------------------------------------------------------------
-# Robust: strict mode
-# ----------------------------------------------------------------------
 set -euo pipefail
 IFS=$'\n\t'
 
-# ----------------------------------------------------------------------
-# Robust: resolve script directory and repo root (works from any CWD)
-# ----------------------------------------------------------------------
-SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd )"
-if REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then
+SUBMIT_DIR="${SLURM_SUBMIT_DIR:-$PWD}"
+if REPO_ROOT="$(git -C "$SUBMIT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then
   :
 else
-  REPO_ROOT="$(realpath "$SCRIPT_DIR/../..")"
+  REPO_ROOT="$SUBMIT_DIR"
+  for _ in 1 2 3 4 5 6; do
+    [[ -d "$REPO_ROOT/.git" || -d "$REPO_ROOT/eval" ]] && break
+    PARENT="$(dirname "$REPO_ROOT")"
+    [[ "$PARENT" == "$REPO_ROOT" ]] && break
+    REPO_ROOT="$PARENT"
+  done
 fi
 
-# ----------------------------------------------------------------------
-# Robust: conda activation (portable, no hardcoding)
-#   1) Use shell hook if conda is on PATH
-#   2) Fallback to your original source path (kept)
-#   3) Try hook again after sourcing
-# ----------------------------------------------------------------------
 if command -v conda &>/dev/null; then
   eval "$(conda shell.bash hook)"
+elif [[ -n "${CONDA_EXE:-}" ]]; then
+  CONDA_BASE="$("$CONDA_EXE" info --base 2>/dev/null)" || true
+  if [[ -n "${CONDA_BASE:-}" && -r "$CONDA_BASE/etc/profile.d/conda.sh" ]]; then
+    # shellcheck disable=SC1090
+    source "$CONDA_BASE/etc/profile.d/conda.sh"
+    eval "$(conda shell.bash hook)" || true
+  fi
 elif [[ -r "/scratch/ssd004/scratch/merc0606/miniconda3/etc/profile.d/conda.sh" ]]; then
   # original path (kept as fallback)
   # shellcheck disable=SC1091
@@ -65,8 +66,9 @@ fi
 # Activate the intended env
 conda activate internvl
 
+DEST_DIR=aug14_samples
 GT_CAPTIONS="$REPO_ROOT/data/generated_captions/CUB_captions/CUB_captions.json"
-SAVE_DIR="$REPO_ROOT/data/generated_captions/jul18_samples/llm-judge-ratings"
+SAVE_DIR="$REPO_ROOT/data/generated_captions/${DEST_DIR}/llm-judge-ratings"
 gen_captions=(
     # "$REPO_ROOT/data/generated_captions/jul18_samples/generated_captions/cub/salient_heads_new_threshold.json"
     # "$REPO_ROOT/data/generated_captions/jul18_samples/generated_captions/cub/salient_heads_with_drop_out_captions.json"
@@ -76,7 +78,15 @@ gen_captions=(
     # "$REPO_ROOT/data/generated_captions/jul18_samples/generated_captions/cub/salient_heads_with_zero_out_captions.json"
     # "$REPO_ROOT/data/generated_captions/jul18_samples/generated_captions/cub/plain_captions.json"
     # "$REPO_ROOT/data/generated_captions/jul18_samples/generated_captions/cub/salient_heads_relative.json"
-    "$REPO_ROOT/data/generated_captions/jul18_samples/generated_captions/cub/salient_heads_relative-k-8.json"
+    "$REPO_ROOT/data/generated_captions/${DEST_DIR}/generated_captions/cub/baseline.json"
+    "$REPO_ROOT/data/generated_captions/${DEST_DIR}/generated_captions/cub/pd-new-prompt.json"
+    "$REPO_ROOT/data/generated_captions/${DEST_DIR}/generated_captions/cub/pdm-new-prompt.json"
+    "$REPO_ROOT/data/generated_captions/${DEST_DIR}/generated_captions/cub/pdt-new-prompt.json"
+    "$REPO_ROOT/data/generated_captions/${DEST_DIR}/generated_captions/cub/pdtm-new-prompt.json"
+    "$REPO_ROOT/data/generated_captions/${DEST_DIR}/generated_captions/cub/gaussian-new-prompt.json"
+    "$REPO_ROOT/data/generated_captions/${DEST_DIR}/generated_captions/cub/salient_head.json"
+    "$REPO_ROOT/data/generated_captions/${DEST_DIR}/generated_captions/cub/salient_heads_relative.json"
+    "$REPO_ROOT/data/generated_captions/${DEST_DIR}/generated_captions/cub/salient-head-new-norm.json"
 )
 
 # Keep original working-intent but make paths stable from REPO_ROOT

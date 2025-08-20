@@ -28,15 +28,19 @@ if ! command -v conda &>/dev/null; then
 fi
 conda activate NSERC
 
-SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd )"
-if REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then :; else
-  REPO_ROOT="$(realpath "$SCRIPT_DIR/../..")"
+SUBMIT_DIR="${SLURM_SUBMIT_DIR:-$PWD}"
+if REPO_ROOT="$(git -C "$SUBMIT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then
+  :
+else
+  REPO_ROOT="$SUBMIT_DIR"
+  for _ in 1 2 3 4 5; do
+    [[ -d "$REPO_ROOT/LLaVA" ]] && break
+    REPO_ROOT="$(dirname "$REPO_ROOT")"
+  done
 fi
 
-# Move to original working directory (LLaVA/llava/eval), but via repo root
 cd "$REPO_ROOT/LLaVA/llava/eval"
 
-# Make PYTHONPATH repo-relative (no hardcoded /fs01/... path)
 export PYTHONPATH="$REPO_ROOT/LLaVA:${PYTHONPATH:-}"
 
 # FIXED

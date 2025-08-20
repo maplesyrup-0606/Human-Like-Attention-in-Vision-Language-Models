@@ -13,20 +13,40 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd )"
-if REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then
+SUBMIT_DIR="${SLURM_SUBMIT_DIR:-$PWD}"
+if REPO_ROOT="$(git -C "$SUBMIT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then
   :
 else
-  REPO_ROOT="$(realpath "$SCRIPT_DIR/../..")"
+  REPO_ROOT="$SUBMIT_DIR"
+  for _ in 1 2 3 4 5 6; do
+    [[ -d "$REPO_ROOT/.git" || -d "$REPO_ROOT/eval" ]] && break
+    PARENT="$(dirname "$REPO_ROOT")"
+    [[ "$PARENT" == "$REPO_ROOT" ]] && break
+    REPO_ROOT="$PARENT"
+  done
 fi
 
 if command -v conda &>/dev/null; then
   eval "$(conda shell.bash hook)"
+elif [[ -n "${CONDA_EXE:-}" ]]; then
+  CONDA_BASE="$("$CONDA_EXE" info --base 2>/dev/null)" || true
+  if [[ -n "${CONDA_BASE:-}" && -r "$CONDA_BASE/etc/profile.d/conda.sh" ]]; then
+    # shellcheck disable=SC1090
+    source "$CONDA_BASE/etc/profile.d/conda.sh"
+    eval "$(conda shell.bash hook)" || true
+  fi
 elif [[ -r "/scratch/ssd004/scratch/merc0606/miniconda3/etc/profile.d/conda.sh" ]]; then
   # original path (kept as fallback)
   # shellcheck disable=SC1091
   source /scratch/ssd004/scratch/merc0606/miniconda3/etc/profile.d/conda.sh
+  eval "$(conda shell.bash hook)" || true
 fi
+
+if ! command -v conda &>/dev/null; then
+  echo "ERROR: conda not found. Load your conda module or ensure conda is on PATH." >&2
+  exit 1
+fi
+
 conda activate metrics
 
 SEMANTICS_DIR="$REPO_ROOT/eval/captions/semantics"

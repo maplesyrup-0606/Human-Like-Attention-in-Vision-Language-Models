@@ -15,10 +15,20 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &>/dev/null && pwd )"
-if REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then :; else
-  REPO_ROOT="$(realpath "$SCRIPT_DIR/../..")"
+
+SUBMIT_DIR="${SLURM_SUBMIT_DIR:-$PWD}"
+if REPO_ROOT="$(git -C "$SUBMIT_DIR" rev-parse --show-toplevel 2>/dev/null)"; then
+  :
+else
+  REPO_ROOT="$SUBMIT_DIR"
+  for _ in 1 2 3 4 5 6; do
+    [[ -d "$REPO_ROOT/.git" || -d "$REPO_ROOT/LLaVA" ]] && break
+    PARENT="$(dirname "$REPO_ROOT")"
+    [[ "$PARENT" == "$REPO_ROOT" ]] && break
+    REPO_ROOT="$PARENT"
+  done
 fi
+
 
 if command -v conda &>/dev/null; then
   eval "$(conda shell.bash hook)"
@@ -51,12 +61,15 @@ QUESTIONS_FILE_PATH="$NSERC_ROOT/eval/captions/hallucination/POPE/output/coco/co
 
 runs=(
     # RUN_NAME, TYPE, MARGIN, TRAJECTORY_MODE, TARGET_LAYER
-#    "baseline,,0,0,"
-#    "salient-head,salient-head,0,0,"
-	"baseline-13b,,0,0,"
-	"salient-head-13b,salient-head,0,0,"
+    # "baseline,,0,0,"
+    # "salient-head,salient-head,0,0,"
+    "baseline-13b,,0,0,"
+    "salient-head-13b,salient-head,0,0,"
 )
 
+# --------------------------------------------------------------------
+# Loop over runs
+# --------------------------------------------------------------------
 for run in "${runs[@]}"; do
     IFS="," read -r RUN_NAME TYPE MARGIN TRAJECTORY_MODE TARGET_LAYER <<< "$run"
 
@@ -82,4 +95,5 @@ for run in "${runs[@]}"; do
         $( [[ -n $TARGET_LAYER ]] && echo --target-layer "$TARGET_LAYER" )
 done
 
+# Return to repo root at end
 cd "$NSERC_ROOT"

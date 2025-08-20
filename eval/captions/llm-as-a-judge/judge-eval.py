@@ -115,7 +115,7 @@
 
 #     compare_judgements(file_paths)
 
-import json, torch
+import json, torch, csv
 from pathlib import Path
 import matplotlib.pyplot as plt
 import re
@@ -142,7 +142,7 @@ def get_scores(rating_path):
     return t.mean().item(), t.std(unbiased=False).item()  # population std; use unbiased=True for sample std
 
 def main():
-    root = Path("~/NSERC/data/generated_captions/jul18_samples/llm-judge-ratings").expanduser()
+    root = Path("~/Human-Like-Attention-in-Vision-Language-Models/data/generated_captions/jul18_samples/llm-judge-ratings").expanduser()
     
     rows = []
     for p in root.rglob("*_ratings.json"):
@@ -157,6 +157,12 @@ def main():
     means    = [r[1] for r in rows]
     stds     = [r[2] for r in rows]
 
+    csv_path = root / "results.csv"
+    with open(csv_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Method","Mean","Std"])
+        writer.writerows(rows)
+    print(f"Saved CSV results to {csv_path}")
     # plot
     plt.figure(figsize=(10, 5))
     x = range(len(methods))
