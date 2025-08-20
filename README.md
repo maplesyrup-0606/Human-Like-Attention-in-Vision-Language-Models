@@ -263,6 +263,6 @@ Model used to generate human gaze scanpaths for each image.
 ---
 Vision-Language Model (VLM) used for experimentation.
 
-- **[`modifications/`](/NSERC/LLaVA/modifications/README.md)** — Contains code for attention manipulation.
+- **[`modifications/`](/Human-Like-Attention-in-Vision-Language-Models/LLaVA/modifications/README.md)** — Contains code for attention manipulation.
   - `modeling_llama.py` — Implementation of the LLaMA model. Attention manipulation logic is located in `LLaMAModel`, `LLaMADecoderLayer`, and `LLaMAAttention`.
   - `kwargs_modification.py` — Utility for argument bypassing.
